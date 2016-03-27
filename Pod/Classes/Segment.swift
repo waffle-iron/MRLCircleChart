@@ -1,9 +1,9 @@
 //
-//  ViewController.swift
-//  MRLCircleChart
+//  Segment.swift
+//  Pods
 //
-//  Created by mlisik on 27/03/2016.
-// 
+//  Created by Marek Lisik on 27/03/16.
+//
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
 //  in the Software without restriction, including without limitation the rights
@@ -22,30 +22,21 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-import UIKit
-import MRLCircleChart
+import Foundation
 
-struct ChartSegment: MRLCircleChart.Segment {
-  var value: UInt
-  var description: String
+public protocol Segment: Equatable, Comparable {
+  var value: UInt { get set }
+  var description: String { get set }
 }
 
-struct Data {
-  static let maxValue: UInt = 100
-  static let values: [UInt] = [10, 20, 40, 30]
+public func ==<T: Segment>(lhs: T, rhs: T) -> Bool {
+  return lhs.value == rhs.value && lhs.description == rhs.description
 }
 
-class ViewController: UIViewController {
-  
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    
-    let data = Data.values.map { (value: UInt) -> ChartSegment in
-      return ChartSegment(value: value, description: "value: \(value)")
-    }
-    let dataSource = MRLCircleChart.DataSource(items: data)
-    print("\(dataSource.items)")
-  }
-
+public func <<T: Segment>(lhs: T, rhs: T) -> Bool {
+  return lhs.value < rhs.value
 }
 
+public func ><T: Segment>(lhs: T, rhs: T) -> Bool {
+  return lhs.value > rhs.value
+}
