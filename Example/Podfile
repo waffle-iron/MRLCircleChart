@@ -1,0 +1,13 @@
+source 'https://github.com/CocoaPods/Specs.git'
+use_frameworks!
+
+target 'MRLCircleChart_Example', :exclusive => true do
+  pod 'MRLCircleChart', :path => '../'
+end
+
+target 'MRLCircleChart_Tests', :exclusive => true do
+  pod 'MRLCircleChart', :path => '../'
+
+  pod 'Quick', '~> 0.8'
+  pod 'Nimble', '~> 3.0'
+end
