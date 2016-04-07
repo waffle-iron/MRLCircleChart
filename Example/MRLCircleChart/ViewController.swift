@@ -25,7 +25,7 @@
 import UIKit
 import MRLCircleChart
 
-struct ChartSegment: MRLCircleChart.Segment {
+struct ChartSegment: MRLCircleChart.ChartValue {
   var value: UInt
   var description: String
 }
@@ -43,7 +43,7 @@ class ViewController: UIViewController {
     let data = Data.values.map { (value: UInt) -> ChartSegment in
       return ChartSegment(value: value, description: "value: \(value)")
     }
-    let dataSource = MRLCircleChart.DataSource(items: data)
+    let dataSource = MRLCircleChart.DataSource<ChartSegment>(items: data)
     print("\(dataSource.items)")
   }
 

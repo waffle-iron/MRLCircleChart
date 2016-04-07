@@ -24,11 +24,11 @@
 
 import Foundation
 
-public class DataSource<Item: Segment> {
+public class DataSource<Item: ChartValue> {
 
   public var items: [Item]
 
-  public required init(items: [Item], maxValue: Item) {
+  public required init(items: [Item]) {
     self.items = items
   }
 }
