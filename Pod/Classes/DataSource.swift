@@ -1,6 +1,6 @@
 //
 //  ChartDataSource.swift
-//  Pods
+//  MRLCircleChart
 //
 //  Created by Marek Lisik on 27/03/16.
 //
@@ -26,15 +26,21 @@ import Foundation
 
 public class DataSource<Item: ChartValue> {
 
-  public var items: [Item]
-
-  public required init(items: [Item]) {
-    self.items = items
+  public var maxValue: UInt
+  public var numberOfItems: Int {
+    return items.count
   }
+  
+  public required init(items: [Item], maxValue: UInt) {
+    self.items = items
+    self.maxValue = maxValue
+  }
+  
+  private var items: [Item]
 }
 
 extension DataSource {
-
+  
   func item(index: Int) -> Item? {
     guard index < items.count
           && index >= 0 else {
@@ -51,5 +57,33 @@ extension DataSource {
     }
     return index
   }
-
+  
+  func startAngle(index: Int) -> CGFloat {
+    let slice = items[0..<index]
+    let angle = slice.enumerate().reduce(0) { (sum, next) -> CGFloat in
+      return sum + arcAngle(next.0)
+    }
+    return angle
+  }
+  
+  func endAngle(index: Int) -> CGFloat {
+    return startAngle(index) + arcAngle(index) + 0.01 // Extends endAngle to avoid unsighlty gaps between segments that are caused by antialiasing
+  }
+  
+  func arcAngle(index: Int) -> CGFloat {
+    guard let segment = item(index) else {
+      return 0
+    }
+    let angle = Double(segment.value) / Double(totalValue()) * 2 * M_PI
+    return CGFloat(angle)
+  }
+  
+  func totalValue() -> UInt {
+    let value = items.reduce(0) { (sum, next) -> UInt in
+      return sum + next.value
+    }
+    return value
+  }
 }
+
+

@@ -24,7 +24,7 @@
 
 import Foundation
 
-public protocol ChartValue {
+public protocol ChartValue: Comparable {
   var value: UInt { get set }
   var description: String { get set }
 }

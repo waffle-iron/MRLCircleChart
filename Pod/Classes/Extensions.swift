@@ -1,9 +1,9 @@
 //
-//  ViewController.swift
+//  Extensions.swift
 //  MRLCircleChart
 //
-//  Created by mlisik on 27/03/2016.
-// 
+//  Created by Marek Lisik on 27/03/16.
+//
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
 //  in the Software without restriction, including without limitation the rights
@@ -23,32 +23,44 @@
 //  THE SOFTWARE.
 
 import UIKit
-import MRLCircleChart
 
-struct ChartSegment: MRLCircleChart.ChartValue {
-  var value: UInt
-  var description: String
-}
-
-struct Data {
-  static let maxValue: UInt = 1000
-  static let values: [UInt] = [10, 20, 40, 30, 10, 80, 90, 100, 200, 250, 80, 90]
-}
-
-class ViewController: UIViewController {
-  
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    
-    let data = Data.values.map { (value: UInt) -> ChartSegment in
-      return ChartSegment(value: value, description: "value: \(value)")
-    }.sort()
-    
-    let dataSource = MRLCircleChart.DataSource<ChartSegment>(items: data, maxValue: Data.maxValue)
-    
-    let chart = MRLCircleChart.Chart<ChartSegment>(frame: view.bounds, innerRadius: view.bounds.size.width / 4, outerRadius: view.bounds.size.width / 2 - 40, dataSource: dataSource)
-    view.addSubview(chart)
+extension CGRect {
+  func center() -> CGPoint {
+    return CGPoint(x: size.width / 2, y: size.height / 2)
   }
-
 }
 
+extension UIColor {
+  
+  class func colorRange(beginColor beginColor: UIColor, endColor: UIColor, count: Int) -> [UIColor] {
+    
+    var br: CGFloat = 0
+    var bg: CGFloat = 0
+    var bb: CGFloat = 0
+    var ba: CGFloat = 0
+    
+    beginColor.getRed(&br, green: &bg, blue: &bb, alpha: &ba)
+    
+    var er: CGFloat = 0
+    var eg: CGFloat = 0
+    var eb: CGFloat = 0
+    var ea: CGFloat = 0
+    
+    endColor.getRed(&er, green: &eg, blue: &eb, alpha: &ea)
+    
+    var result:[UIColor] = []
+    
+    for index in 0..<count {
+      var red = br - (br - er) / CGFloat(count) * CGFloat(index)
+      var green = bg - (bg - eg) / CGFloat(count) * CGFloat(index)
+      var blue = bb - (bb - eb) / CGFloat(count) * CGFloat(index)
+      var alpha = ba - (ba - ea) / CGFloat(count) * CGFloat(index)
+      
+      let color = UIColor(red:red, green:green, blue:blue, alpha:alpha)
+      
+      result.append(color)
+    }
+    
+    return result
+  }
+}
