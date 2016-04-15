@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = 'F4048CD892DE99EDB99878BC'
+               BlueprintIdentifier = 'EF4440E5969D8F2D02E7AABA'
                BlueprintName = 'MRLCircleChart'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'MRLCircleChart.framework'>

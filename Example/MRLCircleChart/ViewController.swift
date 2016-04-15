@@ -25,30 +25,69 @@
 import UIKit
 import MRLCircleChart
 
-struct ChartSegment: MRLCircleChart.ChartValue {
-  var value: UInt
-  var description: String
-}
-
 struct Data {
   static let maxValue: UInt = 1000
   static let values: [UInt] = [10, 20, 40, 30, 10, 80, 90, 100, 200, 250, 80, 90]
 }
 
+class DataSource: MRLCircleChart.DataSource {
+  var chartSegments: [MRLCircleChart.Segment]
+  
+  init(items: [MRLCircleChart.Segment]) {
+    self.chartSegments = items
+  }
+}
+
 class ViewController: UIViewController {
+  
+  @IBOutlet var chart: MRLCircleChart.Chart?
+  @IBOutlet var stepper: UIStepper?
+  
+  var dataSource = DataSource(items: [])
   
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    let data = Data.values.map { (value: UInt) -> ChartSegment in
-      return ChartSegment(value: value, description: "value: \(value)")
-    }.sort()
+    setupData()
     
-    let dataSource = MRLCircleChart.DataSource<ChartSegment>(items: data, maxValue: Data.maxValue)
-    
-    let chart = MRLCircleChart.Chart<ChartSegment>(frame: view.bounds, innerRadius: view.bounds.size.width / 4, outerRadius: view.bounds.size.width / 2 - 40, dataSource: dataSource)
-    view.addSubview(chart)
+    if let tempChart = chart {
+      tempChart.dataSource = dataSource
+    }
   }
-
+  
+  private func setupData() {
+    dataSource.chartSegments = Data.values.map { (value: UInt) -> MRLCircleChart.Segment in
+      return MRLCircleChart.Segment(value: value, description: "value: \(value)")
+    }.sort { $0 < $1 }
+  }
+  
+  @IBAction func beginColorChanged(sender: UIButton) {
+    sender.selected = !sender.selected
+    
+    chart!.beginColor! = sender.selected ? UIColor.greenColor() : UIColor.yellowColor()
+  }
+  
+  @IBAction func endColorChanged(sender: UIButton) {
+    sender.selected = !sender.selected
+    chart!.endColor! = sender.selected ? UIColor.redColor() : UIColor.blueColor()
+  }
+  
+  @IBAction func reverseValues(sender: UIButton) {
+    dataSource.chartSegments = dataSource.chartSegments.reverse()
+    chart!.reloadData()
+  }
+  
+  @IBAction func numberOfItemsChanged(sender: UIStepper) {
+    
+    if dataSource.numberOfItems() > 0 {
+       dataSource.chartSegments.removeLast()
+    }
+    
+//    let slice = data[0..<Int(sender.value)]
+    
+//    dataSource.chartSegments = [Segment]() + slice
+    
+    chart!.reloadData()
+  }
 }
 

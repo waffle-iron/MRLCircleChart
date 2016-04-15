@@ -24,19 +24,6 @@
 
 import UIKit
 
-//class ChartSegment {
-//  
-//  var startAngle: CGFloat
-//  var endAngle: CGFloat
-//  var color: UIColor
-//  
-//  init(startAngle: CGFloat, endAngle: CGFloat, color: UIColor) {
-//    self.startAngle = startAngle
-//    self.endAngle = endAngle
-//    self.color = color
-//  }
-//}
-
 private enum ChartProperties {
   static let dataSourceKey = "dataSource"
   static let maxAngleKey = "maxAngle"
@@ -44,67 +31,146 @@ private enum ChartProperties {
   static let outerRadiusKey = "outerRadius"
 }
 
-public class Chart<Segment: ChartValue>: UIView {
+@objc
+public class Chart: UIView {
   
-  public var dataSource: DataSource<Segment>?
-  public var innerRadius: CGFloat = 0
-  public var outerRadius: CGFloat = 0
+  //MARK: - Public variables
+  
+  public var dataSource: DataSource?
+  
+  //MARK: - Public Inspectables
+  
+  @IBInspectable public var innerRadius: CGFloat = 0
+  @IBInspectable public var outerRadius: CGFloat = 0
+  @IBInspectable public var beginColor: UIColor? {
+    didSet { updateLayers() }
+  }
+  @IBInspectable public var endColor: UIColor? {
+    didSet { updateLayers() }
+  }
+  
+  //MARK: - Private variables
   
   private var chartSegmentLayers: [SegmentLayer] = []
   private let chartContainer = UIView()
-
-  public required init(frame: CGRect, innerRadius: CGFloat, outerRadius: CGFloat, dataSource: DataSource<Segment>) {
+  private var outerRadiusRatio: CGFloat = 0.0
+  private var innerRadiusRatio: CGFloat = 0.0
+  
+  //MARK: - Initializers
+  
+  public required init(frame: CGRect, innerRadius: CGFloat, outerRadius: CGFloat, dataSource: DataSource, beginColor: UIColor = UIColor.greenColor(), endColor: UIColor = UIColor.yellowColor()) {
     self.innerRadius = innerRadius
     self.outerRadius = outerRadius
     self.dataSource = dataSource
+    self.beginColor = beginColor
+    self.endColor = endColor
     
     super.init(frame: frame)
-    
-    self.setupLayers()
+    commonInit()
   }
   
   public required init?(coder aDecoder: NSCoder) {
-    
-    self.innerRadius = CGFloat(aDecoder.decodeFloatForKey(ChartProperties.innerRadiusKey))
-    self.outerRadius = CGFloat(aDecoder.decodeFloatForKey(ChartProperties.outerRadiusKey))
-    
     super.init(coder: aDecoder)
-    
-    self.setupLayers()
+    commonInit()
   }
   
-  public override func encodeWithCoder(aCoder: NSCoder) {
-    aCoder.encodeFloat(Float(self.innerRadius), forKey: ChartProperties.innerRadiusKey)
-    aCoder.encodeFloat(Float(self.outerRadius), forKey: ChartProperties.outerRadiusKey)
+  func commonInit() {
+    
   }
+  
+  //MARK: - Public Overrides
+  
+  override public func layoutSubviews() {
+    super.layoutSubviews()
+    updateLayers()
+  }
+  
+  //MARK: - Setup
   
   private func setupChartContainerIfNeeded() {
-    if chartContainer.superview != nil {
-      return
-    }
     
     let squareSide = min(frame.size.width, frame.size.height)
     let squaredBounds = CGRect(origin: CGPointZero, size: CGSize(width: squareSide, height: squareSide))
     
     chartContainer.bounds = squaredBounds
     chartContainer.center = bounds.center()
-    addSubview(chartContainer)
+    chartContainer.backgroundColor = UIColor(red: 0.5, green: 0.9, blue: 0.6, alpha: 1.0)
+    
+    if chartContainer.superview == nil {
+      addSubview(chartContainer)
+    }
+    
+    if outerRadiusRatio == 0 {
+      outerRadiusRatio = outerRadius / (chartContainer.frame.size.width / 2)
+    }
+    
+    if innerRadiusRatio == 0 {
+      innerRadiusRatio = innerRadius / (chartContainer.frame.size.width / 2)
+    }
+    
+    for layer in chartSegmentLayers {
+      layer.frame = chartContainer.bounds
+      layer.position = chartContainer.bounds.center()
+    }
   }
   
-  private func setupLayers() {
-    
+  public func reloadData() {
+    self.updateLayers()
+  }
+
+  private func updateLayers() {
     guard let source = dataSource else {
       return
     }
     
     setupChartContainerIfNeeded()
     
-    let pallette = UIColor.colorRange(beginColor: UIColor.redColor(), endColor: UIColor.greenColor(), count: source.numberOfItems)
+    let pallette = UIColor.colorRange(beginColor: beginColor!, endColor: endColor!, count: source.numberOfItems())
     
-    for index in 0..<source.numberOfItems {
-      let layer = SegmentLayer(frame: chartContainer.bounds, start: source.startAngle(index) , end: source.endAngle(index), outerRadius: outerRadius, innerRadius: innerRadius, color: pallette[index].CGColor)
-      chartContainer.layer.addSublayer(layer)
-      chartSegmentLayers.insert(layer, atIndex: index)
+    let refNumber = max(source.numberOfItems(), chartSegmentLayers.count)
+  
+    for index in 0..<refNumber {
+      guard let item = source.item(index) else {
+        remove(index)
+        continue
+      }
+      
+      guard let layer = layer(index) else {
+        let layer = SegmentLayer(frame: chartContainer.bounds, start: source.startAngle(index), end: source.endAngle(index), outerRadius: outerRadius, innerRadius: innerRadius, color: pallette[index].CGColor)
+        chartContainer.layer.addSublayer(layer)
+        chartSegmentLayers.append(layer)
+        layer.animateInsertion()
+        continue
+      }
+      
+      layer.startAngle = source.startAngle(index)
+      layer.endAngle = source.endAngle(index)
+      layer.color = pallette[index].CGColor
+      
     }
+  }
+  
+  private func layer(index: Int) -> SegmentLayer? {
+    if index >= chartSegmentLayers.count || index < 0 {
+      return nil
+    } else {
+      return chartSegmentLayers[index]
+    }
+  }
+  
+  private func remove(index: Int, animated: Bool = true) {
+    let layer = self.chartSegmentLayers[index]
+    if animated {
+      layer.animateRemoval({
+        if self.chartSegmentLayers.count > index {
+          self.chartSegmentLayers.removeAtIndex(index)
+        }
+      })
+    }
+  }
+  
+  private func insert(index: Int, animated: Bool = true) {
+    let layer = self.chartSegmentLayers[index]
+    layer.animateInsertion()
   }
 }

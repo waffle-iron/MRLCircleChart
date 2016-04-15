@@ -64,3 +64,33 @@ extension UIColor {
     return result
   }
 }
+
+extension NSCoder {
+  func encodeCGColorRef(ref: CGColorRef, key: NSString) {
+    let components = CGColorGetComponents(ref)
+    self.encodeFloat(Float(components[0]), forKey: "\(key)_red")
+    self.encodeFloat(Float(components[1]), forKey: "\(key)_green")
+    self.encodeFloat(Float(components[2]), forKey: "\(key)_blue")
+    self.encodeFloat(Float(components[3]), forKey: "\(key)_alpha")
+  }
+  
+  func decodeCGColorRefForKey(key: NSString) -> CGColorRef {
+    let red = CGFloat(self.decodeFloatForKey("\(key)_red"))
+    let green = CGFloat(self.decodeFloatForKey("\(key)_green"))
+    let blue = CGFloat(self.decodeFloatForKey("\(key)_blue"))
+    let alpha = CGFloat(self.decodeFloatForKey("\(key)_alpha"))
+    
+    let components = [red, green, blue, alpha]
+    
+    return UIColor(red: red, green: green, blue: blue, alpha: alpha).CGColor
+  }
+}
+
+extension CGPoint {
+  public static func midPoint(lhs: CGPoint, rhs: CGPoint) -> CGPoint {
+    return CGPoint(
+      x: round((lhs.x + rhs.x) / 2),
+      y: round((lhs.y + rhs.y) / 2)
+    )
+  }
+}
