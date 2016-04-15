@@ -118,6 +118,7 @@ public class Chart: UIView {
     self.updateLayers()
   }
 
+  private var initialAnimationComplete = false
   private func updateLayers() {
     guard let source = dataSource else {
       return
@@ -136,10 +137,17 @@ public class Chart: UIView {
       }
       
       guard let layer = layer(index) else {
-        let layer = SegmentLayer(frame: chartContainer.bounds, start: source.startAngle(index), end: source.endAngle(index), outerRadius: outerRadius, innerRadius: innerRadius, color: pallette[index].CGColor)
+        let layer = SegmentLayer(
+          frame: chartContainer.bounds,
+          start: source.startAngle(index),
+          end: source.endAngle(index), 
+          outerRadius: outerRadius,
+          innerRadius: innerRadius,
+          color: pallette[index].CGColor
+        )
         chartContainer.layer.addSublayer(layer)
         chartSegmentLayers.append(layer)
-        layer.animateInsertion()
+        layer.animateInsertion(initialAnimationComplete ? CGFloat(M_PI * 2) : 0)
         continue
       }
       
@@ -147,6 +155,7 @@ public class Chart: UIView {
       layer.endAngle = source.endAngle(index)
       layer.color = pallette[index].CGColor
       
+      initialAnimationComplete = true
     }
   }
   
@@ -167,10 +176,5 @@ public class Chart: UIView {
         }
       })
     }
-  }
-  
-  private func insert(index: Int, animated: Bool = true) {
-    let layer = self.chartSegmentLayers[index]
-    layer.animateInsertion()
   }
 }

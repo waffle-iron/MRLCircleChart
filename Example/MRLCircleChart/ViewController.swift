@@ -77,17 +77,18 @@ class ViewController: UIViewController {
     chart!.reloadData()
   }
   
-  @IBAction func numberOfItemsChanged(sender: UIStepper) {
-    
-    if dataSource.numberOfItems() > 0 {
-       dataSource.chartSegments.removeLast()
-    }
-    
-//    let slice = data[0..<Int(sender.value)]
-    
-//    dataSource.chartSegments = [Segment]() + slice
-    
+  @IBAction func addItem(sender: UIButton) {
+    let value: UInt = UInt(random() % 75  + 25)
+    dataSource.append(Segment(value: value, description: "value: \(value)"))
+    dataSource.chartSegments.sortInPlace { $0 < $1 }
     chart!.reloadData()
+  }
+  
+  @IBAction func removeItem(sender: UIButton) {
+    if dataSource.numberOfItems() > 0 {
+      dataSource.remove(dataSource.numberOfItems() - 1)
+      chart!.reloadData()
+    }
   }
 }
 

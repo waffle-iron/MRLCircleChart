@@ -53,38 +53,49 @@
                                     <action selector="endColorChanged:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="KC1-i7-Qew"/>
                                 </connections>
                             </button>
-                            <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="12" maximumValue="12" stepValue="2" translatesAutoresizingMaskIntoConstraints="NO" id="mEM-rR-qp1">
-                                <rect key="frame" x="253" y="551" width="94" height="29"/>
-                                <connections>
-                                    <action selector="numberOfItemsChanged:" destination="vXZ-lx-hvc" eventType="valueChanged" id="7f2-gw-Hia"/>
-                                </connections>
-                            </stepper>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6Mc-A8-Rgg">
-                                <rect key="frame" x="410.5" y="551" width="96" height="30"/>
+                                <rect key="frame" x="411" y="551" width="96" height="30"/>
                                 <state key="normal" title="reverseValues"/>
                                 <connections>
                                     <action selector="reverseValues:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="Cey-FJ-avb"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PsZ-7U-fUw">
+                                <rect key="frame" x="8" y="553" width="51" height="30"/>
+                                <state key="normal" title="remove"/>
+                                <connections>
+                                    <action selector="removeItem:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="xsz-Yu-CDP"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7vb-2g-gHY">
+                                <rect key="frame" x="245" y="553" width="30" height="30"/>
+                                <state key="normal" title="add"/>
+                                <connections>
+                                    <action selector="addItem:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="0wU-Zv-BI4"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="7vb-2g-gHY" firstAttribute="trailing" secondItem="Snr-Pi-jLa" secondAttribute="trailing" id="6iE-0M-P82"/>
                             <constraint firstItem="Snr-Pi-jLa" firstAttribute="top" secondItem="mDV-Ut-tyj" secondAttribute="bottom" constant="5" id="6lR-mf-yzV"/>
                             <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="mDV-Ut-tyj" secondAttribute="bottom" constant="50" id="ArU-aI-Npd"/>
+                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="PsZ-7U-fUw" secondAttribute="bottom" constant="17" id="B1l-rX-Lis"/>
                             <constraint firstItem="rxY-5T-T24" firstAttribute="trailing" secondItem="mDV-Ut-tyj" secondAttribute="trailing" id="Blf-2O-hZu"/>
                             <constraint firstItem="rxY-5T-T24" firstAttribute="width" secondItem="Snr-Pi-jLa" secondAttribute="width" id="Hjv-b6-hGK"/>
                             <constraint firstItem="Snr-Pi-jLa" firstAttribute="leading" secondItem="mDV-Ut-tyj" secondAttribute="leading" id="Htr-0h-bXd"/>
                             <constraint firstItem="mDV-Ut-tyj" firstAttribute="leading" secondItem="Stw-8A-c3g" secondAttribute="leading" constant="8" id="NFt-6h-1Zo"/>
-                            <constraint firstItem="mEM-rR-qp1" firstAttribute="top" secondItem="Snr-Pi-jLa" secondAttribute="bottom" constant="6" id="P7m-F9-95Z"/>
-                            <constraint firstItem="6Mc-A8-Rgg" firstAttribute="top" secondItem="mEM-rR-qp1" secondAttribute="top" id="RG7-hk-F7k"/>
                             <constraint firstItem="rxY-5T-T24" firstAttribute="leading" secondItem="Snr-Pi-jLa" secondAttribute="trailing" constant="50" id="Tjt-dt-42C"/>
+                            <constraint firstItem="PsZ-7U-fUw" firstAttribute="top" secondItem="Snr-Pi-jLa" secondAttribute="bottom" constant="8" id="Uah-A7-IvE"/>
+                            <constraint firstItem="7vb-2g-gHY" firstAttribute="top" secondItem="Snr-Pi-jLa" secondAttribute="bottom" constant="8" id="V7E-l6-SEe"/>
                             <constraint firstItem="6Mc-A8-Rgg" firstAttribute="centerX" secondItem="rxY-5T-T24" secondAttribute="centerX" id="YHd-a3-Y5k"/>
-                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="mEM-rR-qp1" secondAttribute="bottom" constant="20" id="f02-cP-uap"/>
-                            <constraint firstItem="mEM-rR-qp1" firstAttribute="centerX" secondItem="mDV-Ut-tyj" secondAttribute="centerX" id="hFK-6V-Jrb"/>
+                            <constraint firstItem="PsZ-7U-fUw" firstAttribute="leading" secondItem="Snr-Pi-jLa" secondAttribute="leading" id="eZV-rS-O0J"/>
+                            <constraint firstItem="6Mc-A8-Rgg" firstAttribute="top" secondItem="rxY-5T-T24" secondAttribute="bottom" constant="6" id="g7S-Iu-gsL"/>
                             <constraint firstItem="rxY-5T-T24" firstAttribute="baseline" secondItem="Snr-Pi-jLa" secondAttribute="firstBaseline" id="lp1-2B-cBM"/>
                             <constraint firstAttribute="trailing" secondItem="mDV-Ut-tyj" secondAttribute="trailing" constant="8" id="oo7-AB-ZfY"/>
                             <constraint firstItem="rxY-5T-T24" firstAttribute="top" secondItem="Snr-Pi-jLa" secondAttribute="top" id="q53-LL-bfA"/>
                             <constraint firstItem="Snr-Pi-jLa" firstAttribute="baseline" secondItem="rxY-5T-T24" secondAttribute="firstBaseline" id="sgv-cl-NTv"/>
+                            <constraint firstItem="7vb-2g-gHY" firstAttribute="centerY" secondItem="PsZ-7U-fUw" secondAttribute="centerY" id="wkG-df-Cse"/>
                             <constraint firstItem="mDV-Ut-tyj" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="8" id="yJc-j7-Zbb"/>
                         </constraints>
                         <variation key="default">
@@ -95,7 +106,6 @@
                     </view>
                     <connections>
                         <outlet property="chart" destination="mDV-Ut-tyj" id="Lhj-Zb-mXB"/>
-                        <outlet property="stepper" destination="mEM-rR-qp1" id="RH8-Zp-hBj"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>

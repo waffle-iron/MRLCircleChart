@@ -168,17 +168,15 @@ class SegmentLayer: CALayer {
     
     self.addAnimation(animation(PropertyKeys.startAngleKey, toValue: M_PI * 2, fromValue: startAngle), forKey: "startAngle")
     self.addAnimation(animation(PropertyKeys.endAngleKey, toValue: M_PI * 2, fromValue: endAngle), forKey: "endAngle")
-    self.addAnimation(animation("opacity", toValue: 0.0, fromValue: 1.0), forKey: "opacity")
     
     CATransaction.commit()
   }
   
-  func animateInsertion() {
+  func animateInsertion(startAngle: CGFloat) {
     CATransaction.begin()
     
-    
-    self.addAnimation(animation(PropertyKeys.startAngleKey, toValue: self.startAngle, fromValue: M_PI * 2), forKey: "startAngle")
-    self.addAnimation(animation(PropertyKeys.endAngleKey, toValue: self.endAngle, fromValue: M_PI * 2), forKey: "endAngle")
+    self.addAnimation(animation(PropertyKeys.startAngleKey, toValue: self.startAngle, fromValue: startAngle), forKey: "startAngle")
+    self.addAnimation(animation(PropertyKeys.endAngleKey, toValue: self.endAngle, fromValue: startAngle), forKey: "endAngle")
     
     CATransaction.commit()
   }
@@ -251,15 +249,7 @@ class SegmentLayer: CALayer {
       endAngle: startAngle,
       clockwise: false
     )
-    
-//    let beginRoundCapOrigin = CGPoint.midPoint(innerStartPoint, rhs: outerStartPoint)
-//    let beginRoundCap = UIBezierPath(arcCenter: beginRoundCapOrigin, radius: abs(round((outerRadius - innerRadius) / 2)), startAngle: 0, endAngle: CGFloat(M_PI) * 2, clockwise: true)
-//    path.appendPath(beginRoundCap)
-//    
-//    let endRoundCapOrigin = CGPoint.midPoint(innerEndPoint, rhs: outerEndPoint)
-//    let endRoundCap = UIBezierPath(arcCenter: endRoundCapOrigin, radius: abs(round((outerRadius - innerRadius) / 2)), startAngle: 0, endAngle: CGFloat(M_PI) * 2, clockwise: true)
-//    path.appendPath(endRoundCap)
-    
+        
     return path.CGPath
   }
   
