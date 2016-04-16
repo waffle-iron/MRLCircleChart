@@ -1,6 +1,6 @@
 //
 //  ChartDataSource.swift
-//  Pods
+//  MRLCircleChart
 //
 //  Created by Marek Lisik on 27/03/16.
 //
@@ -24,32 +24,78 @@
 
 import Foundation
 
-public class DataSource<Item: Segment> {
-
-  public var items: [Item]
-
-  public required init(items: [Item], maxValue: Item) {
-    self.items = items
-  }
+public protocol DataSource {
+  var chartSegments: [Segment] { get set  }
 }
 
 extension DataSource {
-
-  func item(index: Int) -> Item? {
-    guard index < items.count
+  
+  //MARK: - Item Helpers
+  
+  public func numberOfItems() -> Int {
+    return chartSegments.count
+  }
+  
+  public func item(index: Int) -> Segment? {
+    guard index < chartSegments.count
           && index >= 0 else {
       return nil
     }
-    return items[index]
+    return chartSegments[index]
   }
 
-  func indexOf(item: Item) -> Int {
-    guard let index = items.indexOf( { (itemToCheck: Item) -> Bool in
+  public func indexOf(item: Segment) -> Int {
+    guard let index = chartSegments.indexOf( { (itemToCheck: Segment) -> Bool in
       return itemToCheck == item
     }) else {
       return NSNotFound
     }
     return index
   }
-
+  
+  public func totalValue() -> UInt {
+    let value = chartSegments.reduce(0) { (sum, next) -> UInt in
+      return sum + next.value
+    }
+    return value
+  }
+  
+  //MARK: - Data Manipulation
+  
+  public mutating func remove(index: Int) -> Segment? {
+    guard let item = item(index) else {
+      return nil
+    }
+    return chartSegments.removeAtIndex(index)
+  }
+  
+  public mutating func insert(item: Segment, index: Int) {
+    chartSegments.insert(item, atIndex: index)
+  }
+  
+  public mutating func append(item: Segment) {
+    chartSegments.append(item)
+  }
+  
+  //MARK: - Angle Helpers
+  
+  func startAngle(index: Int) -> CGFloat {
+    let slice = chartSegments[0..<index]
+    let angle = slice.enumerate().reduce(0) { (sum, next) -> CGFloat in
+      return sum + arcAngle(next.0)
+    }
+    return angle
+  }
+  
+  func endAngle(index: Int) -> CGFloat {
+    return startAngle(index) + arcAngle(index) + 0.01 // Extends endAngle to avoid unsighlty gaps between segments that are caused by antialiasing
+  }
+  
+  func arcAngle(index: Int) -> CGFloat {
+    guard let segment = item(index) else {
+      return 0
+    }
+    let angle = Double(segment.value) / Double(totalValue()) * 2 * M_PI
+    return CGFloat(angle)
+  }
 }

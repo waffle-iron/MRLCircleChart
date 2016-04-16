@@ -25,27 +25,70 @@
 import UIKit
 import MRLCircleChart
 
-struct ChartSegment: MRLCircleChart.Segment {
-  var value: UInt
-  var description: String
+struct Data {
+  static let maxValue: UInt = 1000
+  static let values: [UInt] = [10, 20, 40, 30, 10, 80, 90, 100, 200, 250, 80, 90]
 }
 
-struct Data {
-  static let maxValue: UInt = 100
-  static let values: [UInt] = [10, 20, 40, 30]
+class DataSource: MRLCircleChart.DataSource {
+  var chartSegments: [MRLCircleChart.Segment]
+  
+  init(items: [MRLCircleChart.Segment]) {
+    self.chartSegments = items
+  }
 }
 
 class ViewController: UIViewController {
   
+  @IBOutlet var chart: MRLCircleChart.Chart?
+  @IBOutlet var stepper: UIStepper?
+  
+  var dataSource = DataSource(items: [])
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    let data = Data.values.map { (value: UInt) -> ChartSegment in
-      return ChartSegment(value: value, description: "value: \(value)")
+    setupData()
+    
+    if let tempChart = chart {
+      tempChart.dataSource = dataSource
     }
-    let dataSource = MRLCircleChart.DataSource(items: data)
-    print("\(dataSource.items)")
   }
-
+  
+  private func setupData() {
+    dataSource.chartSegments = Data.values.map { (value: UInt) -> MRLCircleChart.Segment in
+      return MRLCircleChart.Segment(value: value, description: "value: \(value)")
+    }.sort { $0 < $1 }
+  }
+  
+  @IBAction func beginColorChanged(sender: UIButton) {
+    sender.selected = !sender.selected
+    
+    chart!.beginColor! = sender.selected ? UIColor.greenColor() : UIColor.yellowColor()
+  }
+  
+  @IBAction func endColorChanged(sender: UIButton) {
+    sender.selected = !sender.selected
+    chart!.endColor! = sender.selected ? UIColor.redColor() : UIColor.blueColor()
+  }
+  
+  @IBAction func reverseValues(sender: UIButton) {
+    dataSource.chartSegments = dataSource.chartSegments.reverse()
+    chart!.reloadData()
+  }
+  
+  @IBAction func addItem(sender: UIButton) {
+    let value: UInt = UInt(random() % 75  + 25)
+    dataSource.append(Segment(value: value, description: "value: \(value)"))
+    dataSource.chartSegments.sortInPlace { $0 < $1 }
+    chart!.reloadData()
+  }
+  
+  @IBAction func removeItem(sender: UIButton) {
+    if dataSource.numberOfItems() > 0 {
+      dataSource.remove(dataSource.numberOfItems() - 1)
+      chart!.reloadData()
+    }
+  }
 }
 

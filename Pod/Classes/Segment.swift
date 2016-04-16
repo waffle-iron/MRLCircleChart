@@ -1,6 +1,6 @@
 //
 //  Segment.swift
-//  Pods
+//  MRLCircleChart
 //
 //  Created by Marek Lisik on 27/03/16.
 //
@@ -24,19 +24,24 @@
 
 import Foundation
 
-public protocol Segment: Equatable, Comparable {
-  var value: UInt { get set }
-  var description: String { get set }
+@objc public class Segment: NSObject, Comparable {
+  public var value: UInt
+  public var valueDescription: String
+  
+  required public init(value: UInt, description: String) {
+    self.value = value
+    self.valueDescription = description
+  }
 }
 
-public func ==<T: Segment>(lhs: T, rhs: T) -> Bool {
-  return lhs.value == rhs.value && lhs.description == rhs.description
+public func ==(lhs: Segment, rhs: Segment) -> Bool {
+  return lhs.value == rhs.value && lhs.valueDescription == rhs.valueDescription
 }
 
-public func <<T: Segment>(lhs: T, rhs: T) -> Bool {
+public func <(lhs: Segment, rhs: Segment) -> Bool {
   return lhs.value < rhs.value
 }
 
-public func ><T: Segment>(lhs: T, rhs: T) -> Bool {
+public func >(lhs: Segment, rhs: Segment) -> Bool {
   return lhs.value > rhs.value
 }
