@@ -24,6 +24,9 @@
 
 import UIKit
 
+/* 
+ * Provides keys for easy access to Chart properties
+ */
 private enum ChartProperties {
   static let dataSourceKey = "dataSource"
   static let maxAngleKey = "maxAngle"
@@ -31,6 +34,12 @@ private enum ChartProperties {
   static let outerRadiusKey = "outerRadius"
 }
 
+/*
+ * Chart is a `UIView` subclass that provides a graphical representation
+ * of it's data source in the form of a pie chart. It manages an array of
+ * SegmentLayers that draw each segment of the chart individually, and relies
+ * on it's data source for relaying values (also angle values) for each layer.
+ */
 @objc
 public class Chart: UIView {
   
@@ -43,10 +52,10 @@ public class Chart: UIView {
   @IBInspectable public var innerRadius: CGFloat = 0
   @IBInspectable public var outerRadius: CGFloat = 0
   @IBInspectable public var beginColor: UIColor? {
-    didSet { updateLayers() }
+    didSet { reloadData() }
   }
   @IBInspectable public var endColor: UIColor? {
-    didSet { updateLayers() }
+    didSet { reloadData() }
   }
   
   //MARK: - Private variables
@@ -58,6 +67,30 @@ public class Chart: UIView {
   
   //MARK: - Initializers
   
+  /**
+   Default initializer for ChartView, provides most of the customization points
+  
+   Note: `innerRadius` and `outerRadius` are initially used to calculate a ratio
+   of these values to overal chart frame, so that the chart is sized correclty
+   when changes to the frame are made
+   
+   Note: `beginColor` and `endColor` are used to derive a range, or gradient of 
+   colors, that provide a smooth transition between each segment
+   
+   - parameter frame:       frame used to display the chart view; since chart 
+   itself requires square bounds, the greates square frame that fits in the 
+   frame is derived and centered in chart frame
+   - parameter innerRadius: if larger than 0, defines the radius of an inner 
+   'hole' in the chart
+   - parameter outerRadius: defines the outer radius of the chart, should be 
+   greater than `innerRadius`
+   - parameter dataSource:  `DataSource` complying object that provides all
+   data details for the chart view
+   - parameter beginColor:  color of the first chart segment layer
+   - parameter endColor:    color of the last chart segment layer
+   
+   - returns: fully configured chart view
+   */
   public required init(frame: CGRect, innerRadius: CGFloat, outerRadius: CGFloat, dataSource: DataSource, beginColor: UIColor = UIColor.greenColor(), endColor: UIColor = UIColor.yellowColor()) {
     self.innerRadius = innerRadius
     self.outerRadius = outerRadius
@@ -66,27 +99,30 @@ public class Chart: UIView {
     self.endColor = endColor
     
     super.init(frame: frame)
-    commonInit()
   }
   
   public required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
-    commonInit()
-  }
-  
-  func commonInit() {
-    
   }
   
   //MARK: - Public Overrides
   
   override public func layoutSubviews() {
     super.layoutSubviews()
-    updateLayers()
+    reloadData()
   }
   
   //MARK: - Setup
   
+  /**
+   Calculates the view that will hold individual `SegmentLayers` as well as
+   the square frame for that view, in such a way that it fills the most of the
+   available frame. 
+   
+   This is also used to resize the container appropriately with bounds changes, 
+   as well as for the intial configuration of `outerRadiusRatio` and 
+   `innerRadiusRatio`.
+   */
   private func setupChartContainerIfNeeded() {
     
     let squareSide = min(frame.size.width, frame.size.height)
@@ -114,12 +150,18 @@ public class Chart: UIView {
     }
   }
   
-  public func reloadData() {
-    self.updateLayers()
-  }
-
+  /**
+   A flag used to distinguish the entry animation (adding elements, clockwise) 
+   from animation used for individual elements (adding elements, 
+   counterclockwise).
+   */
   private var initialAnimationComplete = false
-  private func updateLayers() {
+  
+  /**
+   Querries the `dataSource` for data and inserts, removes, or updates all 
+   relevant segments.
+   */
+  final public func reloadData() {
     guard let source = dataSource else {
       return
     }
@@ -129,7 +171,7 @@ public class Chart: UIView {
     let pallette = UIColor.colorRange(beginColor: beginColor!, endColor: endColor!, count: source.numberOfItems())
     
     let refNumber = max(source.numberOfItems(), chartSegmentLayers.count)
-  
+    
     for index in 0..<refNumber {
       guard let item = source.item(index) else {
         remove(index)
@@ -140,7 +182,7 @@ public class Chart: UIView {
         let layer = SegmentLayer(
           frame: chartContainer.bounds,
           start: source.startAngle(index),
-          end: source.endAngle(index), 
+          end: source.endAngle(index),
           outerRadius: outerRadius,
           innerRadius: innerRadius,
           color: pallette[index].CGColor
@@ -158,7 +200,15 @@ public class Chart: UIView {
       initialAnimationComplete = true
     }
   }
-  
+
+  /**
+   Returns a `SegmentLayer?` for a given index
+   
+   - parameter index: Int, index to look at
+   
+   - returns: an optional value that's `nil` when index is out of bounds, and 
+   SegmentLayer when a value is found
+   */
   private func layer(index: Int) -> SegmentLayer? {
     if index >= chartSegmentLayers.count || index < 0 {
       return nil
@@ -167,14 +217,26 @@ public class Chart: UIView {
     }
   }
   
+  /**
+   Removes the layer at a given index
+   
+   - parameter index:    index to remove
+   - parameter animated: defaults to `true`, specifies whether the removal 
+   should be animated
+   */
   private func remove(index: Int, animated: Bool = true) {
-    let layer = self.chartSegmentLayers[index]
+    
+    guard let layer = layer(index) else {
+      return
+    }
+    
     if animated {
       layer.animateRemoval({
-        if self.chartSegmentLayers.count > index {
-          self.chartSegmentLayers.removeAtIndex(index)
-        }
+        self.chartSegmentLayers.removeAtIndex(index)
       })
+    } else {
+      self.chartSegmentLayers.removeAtIndex(index)
+      layer.removeFromSuperlayer()
     }
   }
 }
