@@ -88,7 +88,7 @@ extension DataSource {
   }
   
   func endAngle(index: Int) -> CGFloat {
-    return startAngle(index) + arcAngle(index) + 0.01 // Extends endAngle to avoid unsighlty gaps between segments that are caused by antialiasing
+    return startAngle(index) + arcAngle(index) + 0.003 // Extends endAngle to avoid unsighlty gaps between segments that are caused by antialiasing
   }
   
   func arcAngle(index: Int) -> CGFloat {

@@ -49,6 +49,8 @@ class SegmentLayer: CALayer {
     static let animationDuration = 0.75
   }
   
+  var selected = false
+  
   @NSManaged var startAngle: CGFloat
   @NSManaged var endAngle: CGFloat
   @NSManaged var innerRadius: CGFloat
@@ -276,7 +278,6 @@ class SegmentLayer: CALayer {
     let innerStartPoint = pointOnCircle(innerRadius, startAngle)
     let outerStartPoint = pointOnCircle(outerRadius, startAngle)
     let innerEndPoint = pointOnCircle(innerRadius, endAngle)
-    let outerEndPoint = pointOnCircle(outerRadius, endAngle)
     
     let path = UIBezierPath()
     

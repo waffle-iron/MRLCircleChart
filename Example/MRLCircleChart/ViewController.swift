@@ -41,7 +41,6 @@ class DataSource: MRLCircleChart.DataSource {
 class ViewController: UIViewController {
   
   @IBOutlet var chart: MRLCircleChart.Chart?
-  @IBOutlet var stepper: UIStepper?
   
   var dataSource = DataSource(items: [])
   
@@ -52,6 +51,7 @@ class ViewController: UIViewController {
     
     if let tempChart = chart {
       tempChart.dataSource = dataSource
+      tempChart.selectionStyle = .DesaturateNonSelected
     }
   }
   
