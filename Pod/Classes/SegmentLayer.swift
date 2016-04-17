@@ -304,7 +304,6 @@ class SegmentLayer: CALayer {
     return path.CGPath
   }
   
-  
   //MARK: - Hit Testing
   
   override func containsPoint(p: CGPoint) -> Bool {
