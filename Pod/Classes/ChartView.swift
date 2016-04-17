@@ -232,7 +232,9 @@ public class Chart: UIView {
     
     if animated {
       layer.animateRemoval({
-        self.chartSegmentLayers.removeAtIndex(index)
+        if (self.chartSegmentLayers.count > index) {
+          self.chartSegmentLayers.removeAtIndex(index)
+        }
       })
     } else {
       self.chartSegmentLayers.removeAtIndex(index)
