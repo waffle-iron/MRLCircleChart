@@ -31,7 +31,17 @@ extension CGRect {
 }
 
 extension UIColor {
+  /**
+   Calculates a range of colours between `beginColour` and `endColour` with 
+   number of steps equal to `count` and steps distributed evenly.
+   
+   - parameter beginColor: first colour in the returned `Array`
+   - parameter endColor:   final colour in the returned `Array`
+   - parameter count:      number of colours in the returned `Array`
   
+   - returns: `[UIColor]` with number of items equal to `count`, containing a
+   'gradient' of colour values between `beginColor` and `endColor`
+   */
   class func colorRange(beginColor beginColor: UIColor, endColor: UIColor, count: Int) -> [UIColor] {
     
     var br: CGFloat = 0
@@ -66,6 +76,12 @@ extension UIColor {
 }
 
 extension NSCoder {
+  /**
+   Encodes `ref` and associates it with four different keys, one per each
+   colour component (red, green, blue, alpha), with key names based on the 
+   provided `key` such as: red component is encoded under `"\(key)_red"` key and
+   so on.
+   */
   func encodeCGColorRef(ref: CGColorRef, key: NSString) {
     let components = CGColorGetComponents(ref)
     self.encodeFloat(Float(components[0]), forKey: "\(key)_red")
@@ -73,7 +89,13 @@ extension NSCoder {
     self.encodeFloat(Float(components[2]), forKey: "\(key)_blue")
     self.encodeFloat(Float(components[3]), forKey: "\(key)_alpha")
   }
-  
+  /**
+   Decodes and returns a `CGColorRef` whose four color components were 
+   previously encoded under keys derived from the given `key` such as red 
+   component was encoded under `"\(key)_red"` key and so on.
+   
+   - returns: CGColorRef recontructed for a given `key`
+   */
   func decodeCGColorRefForKey(key: NSString) -> CGColorRef {
     let red = CGFloat(self.decodeFloatForKey("\(key)_red"))
     let green = CGFloat(self.decodeFloatForKey("\(key)_green"))
@@ -87,6 +109,12 @@ extension NSCoder {
 }
 
 extension CGPoint {
+  /**
+   Calculates a midpoint located between the two given points, `lhs` and `rhs`. Sequence of
+   arguments given is unimportant.
+   
+   - returns: CGPoint calculated by averaging given points.
+   */
   public static func midPoint(lhs: CGPoint, rhs: CGPoint) -> CGPoint {
     return CGPoint(
       x: round((lhs.x + rhs.x) / 2),
