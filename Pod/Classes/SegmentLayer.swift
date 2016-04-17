@@ -262,28 +262,23 @@ class SegmentLayer: CALayer {
    */
   func path() -> CGPathRef {
     
-    let center = CGPoint(x: self.bounds.size.width / 2, y: self.bounds.size.height/2)
+    let center = bounds.center()
     
-    let innerStartPoint = CGPoint(
-      x: center.x + innerRadius * cos(startAngle),
-      y: center.y + innerRadius * sin(startAngle)
-    )
+    func point(center:CGPoint) -> (CGFloat, CGFloat) -> CGPoint {
+      return {(radius: CGFloat, angle: CGFloat) -> CGPoint in
+        return CGPoint(
+          x: center.x + radius * cos(angle),
+          y: center.y + radius * sin(angle)
+        )
+      }
+    }
     
-    let outerStartPoint = CGPoint(
-      x: center.x + outerRadius * cos(startAngle),
-      y: center.y + outerRadius * sin(startAngle)
-    )
+    let pointOnCircle = point(center)
     
-    let innerEndPoint = CGPoint(
-      x: center.x + innerRadius * cos(endAngle),
-      y: center.y + innerRadius * sin(endAngle)
-    )
-    
-    let outerEndPoint = CGPoint(
-      x: center.x + outerRadius * cos(endAngle),
-      y: center.y + outerRadius * sin(endAngle)
-    )
-    
+    let innerStartPoint = pointOnCircle(innerRadius, startAngle)
+    let outerStartPoint = pointOnCircle(outerRadius, startAngle)
+    let innerEndPoint = pointOnCircle(innerRadius, endAngle)
+    let outerEndPoint = pointOnCircle(outerRadius, endAngle)
     
     let path = UIBezierPath()
     
