@@ -40,7 +40,7 @@ class SegmentLayer: CALayer {
     static let outerRadiusKey = "outerRadius"
     static let colorKey = "color"
     
-    static let animatableProperties = [startAngleKey, endAngleKey, innerRadiusKey, outerRadiusKey]
+    static let animatableProperties = [colorKey, startAngleKey, endAngleKey, innerRadiusKey, outerRadiusKey]
   }
   /**
    Constants used by `SegmentLayer`
@@ -147,7 +147,8 @@ class SegmentLayer: CALayer {
       return animationForColor()
     }
     
-    outer: if PropertyKeys.animatableProperties.contains(event) {
+    outer: if PropertyKeys.animatableProperties.contains(event)
+    && event != PropertyKeys.colorKey {
       if shouldSkipAnimationOnEntry {
           break outer
       }
@@ -216,8 +217,8 @@ class SegmentLayer: CALayer {
       completion()
     })
     
-    self.addAnimation(animation(PropertyKeys.startAngleKey, toValue: M_PI * 2, fromValue: startAngle), forKey: "startAngle")
-    self.addAnimation(animation(PropertyKeys.endAngleKey, toValue: M_PI * 2, fromValue: endAngle), forKey: "endAngle")
+    self.addAnimation(animation(PropertyKeys.startAngleKey, toValue: M_PI * 2, fromValue: startAngle), forKey: PropertyKeys.startAngleKey)
+    self.addAnimation(animation(PropertyKeys.endAngleKey, toValue: M_PI * 2, fromValue: endAngle), forKey: PropertyKeys.endAngleKey)
     
     CATransaction.commit()
   }
@@ -228,17 +229,14 @@ class SegmentLayer: CALayer {
   func animateInsertion(startAngle: CGFloat) {
     CATransaction.begin()
     
-    self.addAnimation(animation(PropertyKeys.startAngleKey, toValue: self.startAngle, fromValue: startAngle), forKey: "startAngle")
-    self.addAnimation(animation(PropertyKeys.endAngleKey, toValue: self.endAngle, fromValue: startAngle), forKey: "endAngle")
+    self.addAnimation(animation(PropertyKeys.startAngleKey, toValue: self.startAngle, fromValue: startAngle), forKey: PropertyKeys.startAngleKey)
+    self.addAnimation(animation(PropertyKeys.endAngleKey, toValue: self.endAngle, fromValue: startAngle), forKey: PropertyKeys.endAngleKey)
     
     CATransaction.commit()
   }
   
   override class func needsDisplayForKey(key: String) -> Bool {
     if PropertyKeys.animatableProperties.contains(key) {
-      return true
-    }
-    if key == PropertyKeys.colorKey {
       return true
     }
     return super.needsDisplayForKey(key)
