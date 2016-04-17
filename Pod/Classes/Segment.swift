@@ -24,10 +24,34 @@
 
 import Foundation
 
-@objc public class Segment: NSObject, Comparable {
+/**
+ Defines values for a a single data point in the pie chart, a sorted
+ collection of these is used by the chart's data source to calculate drawing
+ angles as well as to provide value descriptions for it's accessory views.
+ Note: this class and it's subclasses are `Comparable` by their's `value`
+ property, and `Equatable` on both `value` and `description properties.
+ */
+public class Segment: NSObject, Comparable {
+  
+  /**
+   Value that the instance represents
+   */
   public var value: UInt
+  
+  /**
+   String description to accompany the `Segment's value
+   */
   public var valueDescription: String
   
+  /**
+   Default initializer for the `Segment` class, returns a fully configured
+   instance.
+   
+   - parameter value:       UInt, value to represent
+   - parameter description: String, description to accompany `Segment's` value
+  
+   - returns: `Segment` instance
+   */
   required public init(value: UInt, description: String) {
     self.value = value
     self.valueDescription = description
