@@ -34,11 +34,11 @@ private enum ChartProperties {
   static let outerRadiusKey = "outerRadius"
 }
 
-/*
- * Chart is a `UIView` subclass that provides a graphical representation
- * of it's data source in the form of a pie chart. It manages an array of
- * SegmentLayers that draw each segment of the chart individually, and relies
- * on it's data source for relaying values (also angle values) for each layer.
+/**
+ Chart is a `UIView` subclass that provides a graphical representation
+ of it's data source in the form of a pie chart. It manages an array of
+ SegmentLayers that draw each segment of the chart individually, and relies
+ on it's data source for relaying values (also angle values) for each layer.
  */
 @objc
 public class Chart: UIView {
@@ -46,6 +46,8 @@ public class Chart: UIView {
   //MARK: - Public variables
   
   public var dataSource: DataSource?
+  public var delegate: Delegate?
+  public var selectionStyle: SegmentSelectionStyle = .None
   
   //MARK: - Public Inspectables
   
@@ -64,6 +66,8 @@ public class Chart: UIView {
   private let chartContainer = UIView()
   private var outerRadiusRatio: CGFloat = 0.0
   private var innerRadiusRatio: CGFloat = 0.0
+  private var colorPallette: [UIColor] = []
+  private var grayscalePallette: [UIColor] = []
   
   //MARK: - Initializers
   
@@ -130,7 +134,6 @@ public class Chart: UIView {
     
     chartContainer.bounds = squaredBounds
     chartContainer.center = bounds.center()
-    chartContainer.backgroundColor = UIColor(red: 0.5, green: 0.9, blue: 0.6, alpha: 1.0)
     
     if chartContainer.superview == nil {
       addSubview(chartContainer)
@@ -150,6 +153,25 @@ public class Chart: UIView {
     }
   }
   
+  private func setupColorPallettes() {
+      
+    guard let source = dataSource else {
+      return
+    }
+    
+    colorPallette = UIColor.colorRange(
+      beginColor: beginColor!,
+      endColor: endColor!,
+      count: source.numberOfItems()
+    )
+    
+    grayscalePallette = UIColor.colorRange(
+      beginColor: UIColor(white: 0.6, alpha: 0.5),
+      endColor: UIColor(white: 0.2, alpha: 0.5),
+      count: source.numberOfItems()
+    )
+  }
+  
   /**
    A flag used to distinguish the entry animation (adding elements, clockwise) 
    from animation used for individual elements (adding elements, 
@@ -166,14 +188,13 @@ public class Chart: UIView {
       return
     }
     
+    setupColorPallettes()
     setupChartContainerIfNeeded()
-    
-    let pallette = UIColor.colorRange(beginColor: beginColor!, endColor: endColor!, count: source.numberOfItems())
     
     let refNumber = max(source.numberOfItems(), chartSegmentLayers.count)
     
     for index in 0..<refNumber {
-      guard let item = source.item(index) else {
+      guard let _ = source.item(index) else {
         remove(index)
         continue
       }
@@ -185,7 +206,7 @@ public class Chart: UIView {
           end: source.endAngle(index),
           outerRadius: outerRadius,
           innerRadius: innerRadius,
-          color: pallette[index].CGColor
+          color: colorPallette[index].CGColor
         )
         chartContainer.layer.addSublayer(layer)
         chartSegmentLayers.append(layer)
@@ -195,12 +216,12 @@ public class Chart: UIView {
       
       layer.startAngle = source.startAngle(index)
       layer.endAngle = source.endAngle(index)
-      layer.color = pallette[index].CGColor
+      layer.color = colorPallette[index].CGColor
       
       initialAnimationComplete = true
     }
   }
-
+  
   /**
    Returns a `SegmentLayer?` for a given index
    
@@ -239,6 +260,58 @@ public class Chart: UIView {
     } else {
       self.chartSegmentLayers.removeAtIndex(index)
       layer.removeFromSuperlayer()
+    }
+  }
+  
+  //MARK: - Touches
+  
+  override public func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    guard let touch = touches.first else {
+      return
+    }
+    
+    let point = self.convertPoint(touch.locationInView(self), toCoordinateSpace: chartContainer)
+    
+    for (index, layer) in chartSegmentLayers.enumerate() {
+      if layer.containsPoint(point) {
+        guard let del = delegate else {
+          break
+        }
+        del.chartDidSelectItem(index)
+      }
+    }
+    
+    switch selectionStyle {
+    case .None:
+      break
+    case .Grow:
+      for layer in chartSegmentLayers {
+        layer.selected = layer.containsPoint(point) ? !layer.selected : false
+        layer.outerRadius = layer.selected ? outerRadius + 20 : outerRadius
+      }
+      break
+    case .DesaturateNonSelected:
+      var select = false
+      
+      for layer in chartSegmentLayers {
+        layer.selected = layer.containsPoint(point) ? !layer.selected : false
+      }
+      
+      for layer in chartSegmentLayers {
+        if layer.selected {
+          select = layer.selected
+          break
+        }
+      }
+      
+      for (index, layer) in chartSegmentLayers.enumerate() {
+        if select {
+          layer.color = layer.containsPoint(point) ? colorPallette[index].CGColor : grayscalePallette[index].CGColor
+        } else {
+          layer.color = colorPallette[index].CGColor
+        }
+      }
+      break
     }
   }
 }

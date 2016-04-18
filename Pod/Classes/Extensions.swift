@@ -30,6 +30,13 @@ extension CGRect {
   }
 }
 
+struct HSBComponents {
+  var h: CGFloat
+  var s: CGFloat
+  var b: CGFloat
+  var a: CGFloat
+}
+
 extension UIColor {
   /**
    Calculates a range of colours between `beginColour` and `endColour` with 
@@ -73,6 +80,33 @@ extension UIColor {
     
     return result
   }
+  
+  func desaturated() -> UIColor {
+    var components = self.getHSBComponents()
+    components.s = 0
+    return UIColor.fromHSBComponents(components)
+  }
+  
+  func getHSBComponents() -> HSBComponents {
+    var components = HSBComponents(h: 0, s: 0, b: 0, a: 0)
+    self.getHue(
+      &components.h,
+      saturation: &components.s,
+      brightness: &components.b,
+      alpha: &components.a
+    )
+    return components
+  }
+  
+  static func fromHSBComponents(components: HSBComponents) -> UIColor {
+    return UIColor(
+      hue: components.h,
+      saturation: components.s,
+      brightness: components.b,
+      alpha: components.a
+    )
+  }
+  
 }
 
 extension NSCoder {

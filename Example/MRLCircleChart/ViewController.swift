@@ -41,7 +41,6 @@ class DataSource: MRLCircleChart.DataSource {
 class ViewController: UIViewController {
   
   @IBOutlet var chart: MRLCircleChart.Chart?
-  @IBOutlet var stepper: UIStepper?
   
   var dataSource = DataSource(items: [])
   
@@ -52,6 +51,8 @@ class ViewController: UIViewController {
     
     if let tempChart = chart {
       tempChart.dataSource = dataSource
+      tempChart.selectionStyle = .DesaturateNonSelected
+      tempChart.delegate = self
     }
   }
   
@@ -60,6 +61,8 @@ class ViewController: UIViewController {
       return MRLCircleChart.Segment(value: value, description: "value: \(value)")
     }.sort { $0 < $1 }
   }
+  
+  //MARK: - Actions
   
   @IBAction func beginColorChanged(sender: UIButton) {
     sender.selected = !sender.selected
@@ -92,3 +95,8 @@ class ViewController: UIViewController {
   }
 }
 
+extension ViewController: MRLCircleChart.Delegate {
+  func chartDidSelectItem(index: Int) {
+    print("selected item with index: \(index)")
+  }
+}
