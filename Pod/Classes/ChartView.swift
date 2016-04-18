@@ -34,11 +34,11 @@ private enum ChartProperties {
   static let outerRadiusKey = "outerRadius"
 }
 
-/*
- * Chart is a `UIView` subclass that provides a graphical representation
- * of it's data source in the form of a pie chart. It manages an array of
- * SegmentLayers that draw each segment of the chart individually, and relies
- * on it's data source for relaying values (also angle values) for each layer.
+/**
+ Chart is a `UIView` subclass that provides a graphical representation
+ of it's data source in the form of a pie chart. It manages an array of
+ SegmentLayers that draw each segment of the chart individually, and relies
+ on it's data source for relaying values (also angle values) for each layer.
  */
 @objc
 public class Chart: UIView {
@@ -46,6 +46,7 @@ public class Chart: UIView {
   //MARK: - Public variables
   
   public var dataSource: DataSource?
+  public var delegate: Delegate?
   public var selectionStyle: SegmentSelectionStyle = .None
   
   //MARK: - Public Inspectables
@@ -220,7 +221,7 @@ public class Chart: UIView {
       initialAnimationComplete = true
     }
   }
-
+  
   /**
    Returns a `SegmentLayer?` for a given index
    
@@ -270,6 +271,15 @@ public class Chart: UIView {
     }
     
     let point = self.convertPoint(touch.locationInView(self), toCoordinateSpace: chartContainer)
+    
+    for (index, layer) in chartSegmentLayers.enumerate() {
+      if layer.containsPoint(point) {
+        guard let del = delegate else {
+          break
+        }
+        del.chartDidSelectItem(index)
+      }
+    }
     
     switch selectionStyle {
     case .None:
