@@ -25,7 +25,8 @@
 import Foundation
 
 public protocol DataSource {
-  var chartSegments: [Segment] { get set  }
+  var chartSegments: [Segment] { get set }
+  var maxValue: UInt { get set }
 }
 
 extension DataSource {
@@ -60,6 +61,10 @@ extension DataSource {
     return value
   }
   
+  public func maxValue() -> UInt {
+    return max(totalValue(), maxValue)
+  }
+  
   //MARK: - Data Manipulation
   
   public mutating func remove(index: Int) -> Segment? {
@@ -80,7 +85,8 @@ extension DataSource {
   //MARK: - Angle Helpers
   
   func startAngle(index: Int) -> CGFloat {
-    let slice = chartSegments[0..<index]
+    let rangeBounds = min(chartSegments.count, index)
+    let slice = chartSegments[0..<rangeBounds]
     let angle = slice.enumerate().reduce(0) { (sum, next) -> CGFloat in
       return sum + arcAngle(next.0)
     }
@@ -95,7 +101,7 @@ extension DataSource {
     guard let segment = item(index) else {
       return 0
     }
-    let angle = Double(segment.value) / Double(totalValue()) * 2 * M_PI
+    let angle = Double(segment.value) / Double(maxValue()) * 2 * M_PI
     return CGFloat(angle)
   }
 }

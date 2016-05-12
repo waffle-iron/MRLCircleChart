@@ -30,5 +30,16 @@
  - DesaturateNonSelected: desatures all layers aside from the one selected
  */
 public enum SegmentSelectionStyle {
-  case None, Grow, DesaturateNonSelected
+  /**
+   *  No change of state on segment selection.
+   */
+  case None
+  /**
+   *  On selection, the selected layer will grow in radius
+   */
+  case Grow
+  /**
+   *  On selection, all but the selected layer will be desaturated.
+   */
+  case DesaturateNonSelected
 }

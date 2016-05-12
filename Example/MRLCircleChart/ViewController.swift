@@ -32,9 +32,11 @@ struct Data {
 
 class DataSource: MRLCircleChart.DataSource {
   var chartSegments: [MRLCircleChart.Segment]
+  var maxValue: UInt
   
-  init(items: [MRLCircleChart.Segment]) {
+  init(items: [MRLCircleChart.Segment], maxValue: UInt) {
     self.chartSegments = items
+    self.maxValue = maxValue
   }
 }
 
@@ -42,7 +44,7 @@ class ViewController: UIViewController {
   
   @IBOutlet var chart: MRLCircleChart.Chart?
   
-  var dataSource = DataSource(items: [])
+  var dataSource = DataSource(items: [], maxValue: Data.maxValue)
   
   override func viewDidLoad() {
     super.viewDidLoad()

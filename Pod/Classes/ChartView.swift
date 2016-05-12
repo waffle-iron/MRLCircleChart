@@ -195,7 +195,8 @@ public class Chart: UIView {
     
     for index in 0..<refNumber {
       guard let _ = source.item(index) else {
-        remove(index)
+        let targetAngle = source.maxValue > source.totalValue() ? source.startAngle(index) : CGFloat(M_PI * 2)
+        remove(index, startAngle: targetAngle, endAngle: targetAngle)
         continue
       }
       
@@ -210,13 +211,20 @@ public class Chart: UIView {
         )
         chartContainer.layer.addSublayer(layer)
         chartSegmentLayers.append(layer)
-        layer.animateInsertion(initialAnimationComplete ? CGFloat(M_PI * 2) : 0)
+        layer.animateInsertion(
+          source.maxValue < source.totalValue() ? CGFloat(M_PI * 2) : source.startAngle(index),
+          endAngle: initialAnimationComplete ? nil : CGFloat(M_PI * 2)
+        )
         continue
       }
       
       layer.startAngle = source.startAngle(index)
       layer.endAngle = source.endAngle(index)
       layer.color = colorPallette[index].CGColor
+      
+      let firstLayer = chartSegmentLayers[0]
+      firstLayer.removeFromSuperlayer()
+      chartContainer.layer.addSublayer(firstLayer)
       
       initialAnimationComplete = true
     }
@@ -245,14 +253,14 @@ public class Chart: UIView {
    - parameter animated: defaults to `true`, specifies whether the removal 
    should be animated
    */
-  private func remove(index: Int, animated: Bool = true) {
+  private func remove(index: Int, startAngle: CGFloat = CGFloat(M_PI * 2), endAngle: CGFloat = CGFloat(M_PI * 2), animated: Bool = true) {
     
     guard let layer = layer(index) else {
       return
     }
     
     if animated {
-      layer.animateRemoval({
+      layer.animateRemoval(startAngle: startAngle, endAngle: endAngle, completion: {
         if (self.chartSegmentLayers.count > index) {
           self.chartSegmentLayers.removeAtIndex(index)
         }

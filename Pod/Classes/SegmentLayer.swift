@@ -72,6 +72,7 @@ class SegmentLayer: CALayer {
    
    - returns: a fully configured `SegmentLayer` instance
    */
+
   required init(frame:CGRect, start:CGFloat, end:CGFloat, outerRadius:CGFloat, innerRadius:CGFloat, color:CGColorRef) {
     super.init()
     
@@ -184,7 +185,7 @@ class SegmentLayer: CALayer {
     if let value = presentationLayer()?.valueForKey(key) {
       animation.fromValue = value
     } else {
-      animation.fromValue = 0.0
+      animation.fromValue = CGFloat(M_PI) * 2
     }
     
     return animation
@@ -212,27 +213,33 @@ class SegmentLayer: CALayer {
    `removeFromSuperlayer` when the animation completes, and provides a 
    `completion` closure that is run after the `removeFromSuperlayer` call.
    */
-  func animateRemoval(completion: () -> ()) {
+  func animateRemoval(startAngle exitingStartAngle: CGFloat, endAngle exitingEndAngle: CGFloat, completion: () -> ()) {
     CATransaction.begin()
     CATransaction.setCompletionBlock({
       self.removeFromSuperlayer()
       completion()
     })
+
+    self.startAngle = exitingStartAngle
+    self.endAngle = exitingEndAngle
     
-    self.addAnimation(animation(PropertyKeys.startAngleKey, toValue: M_PI * 2, fromValue: startAngle), forKey: PropertyKeys.startAngleKey)
-    self.addAnimation(animation(PropertyKeys.endAngleKey, toValue: M_PI * 2, fromValue: endAngle), forKey: PropertyKeys.endAngleKey)
+//    self.addAnimation(animation(PropertyKeys.startAngleKey, toValue: exitingStartAngle, fromValue: self.startAngle), forKey: PropertyKeys.startAngleKey)
+//    self.addAnimation(animation(PropertyKeys.endAngleKey, toValue: exitingEndAngle, fromValue: endAngle), forKey: PropertyKeys.endAngleKey)
     
     CATransaction.commit()
   }
   
   /**
-   Animates the insertion of the layer, given a `startAngle`.
+   Animates the insertion of the layer, given an initial `startAngle` and, 
+   optionally, an initial `endAngle` (defaults to 0).
    */
-  func animateInsertion(startAngle: CGFloat) {
+  func animateInsertion(startAngle: CGFloat, endAngle: CGFloat? = nil) {
+    var initialEndAngle = endAngle == nil ? startAngle : endAngle!
+    
     CATransaction.begin()
     
     self.addAnimation(animation(PropertyKeys.startAngleKey, toValue: self.startAngle, fromValue: startAngle), forKey: PropertyKeys.startAngleKey)
-    self.addAnimation(animation(PropertyKeys.endAngleKey, toValue: self.endAngle, fromValue: startAngle), forKey: PropertyKeys.endAngleKey)
+    self.addAnimation(animation(PropertyKeys.endAngleKey, toValue: self.endAngle, fromValue: initialEndAngle), forKey: PropertyKeys.endAngleKey)
     
     CATransaction.commit()
   }
@@ -250,7 +257,6 @@ class SegmentLayer: CALayer {
   override func drawInContext(ctx: CGContext) {
     CGContextBeginPath(ctx)
     CGContextAddPath(ctx, path())
-    CGContextSetStrokeColorWithColor(ctx, color)
     CGContextSetFillColorWithColor(ctx, color)
     CGContextDrawPath(ctx, .Fill)
   }
