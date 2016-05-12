@@ -223,9 +223,6 @@ class SegmentLayer: CALayer {
     self.startAngle = exitingStartAngle
     self.endAngle = exitingEndAngle
     
-//    self.addAnimation(animation(PropertyKeys.startAngleKey, toValue: exitingStartAngle, fromValue: self.startAngle), forKey: PropertyKeys.startAngleKey)
-//    self.addAnimation(animation(PropertyKeys.endAngleKey, toValue: exitingEndAngle, fromValue: endAngle), forKey: PropertyKeys.endAngleKey)
-    
     CATransaction.commit()
   }
   
