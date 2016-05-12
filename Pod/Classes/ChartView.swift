@@ -53,6 +53,7 @@ public class Chart: UIView {
   
   @IBInspectable public var innerRadius: CGFloat = 0
   @IBInspectable public var outerRadius: CGFloat = 0
+  @IBInspectable public var chartBackgroundColor: UIColor = UIColor(white: 0.7, alpha: 0.66)
   @IBInspectable public var beginColor: UIColor? {
     didSet { reloadData() }
   }
@@ -62,8 +63,9 @@ public class Chart: UIView {
   
   //MARK: - Private variables
   
-  private var chartSegmentLayers: [SegmentLayer] = []
   private let chartContainer = UIView()
+  private var chartBackgroundSegment: SegmentLayer?
+  private var chartSegmentLayers: [SegmentLayer] = []
   private var outerRadiusRatio: CGFloat = 0.0
   private var innerRadiusRatio: CGFloat = 0.0
   private var colorPallette: [UIColor] = []
@@ -136,7 +138,14 @@ public class Chart: UIView {
     chartContainer.center = bounds.center()
     
     if chartContainer.superview == nil {
+      chartContainer.transform = CGAffineTransformMakeRotation(CGFloat(-M_PI_2))
       addSubview(chartContainer)
+      
+      if chartBackgroundSegment == nil {
+        chartBackgroundSegment = SegmentLayer(frame: chartContainer.bounds, start: 0, end: CGFloat(M_PI * 2), outerRadius: outerRadius, innerRadius: innerRadius, color: chartBackgroundColor.CGColor)
+        chartContainer.layer.addSublayer(chartBackgroundSegment!)
+      }
+      
     }
     
     if outerRadiusRatio == 0 {
