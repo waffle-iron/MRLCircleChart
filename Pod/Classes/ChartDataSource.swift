@@ -65,6 +65,10 @@ extension DataSource {
     return max(totalValue(), maxValue)
   }
   
+  public func isFullCircle() -> Bool {
+    return maxValue <= totalValue()
+  }
+  
   //MARK: - Data Manipulation
   
   public mutating func remove(index: Int) -> Segment? {
