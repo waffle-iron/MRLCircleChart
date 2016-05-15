@@ -39,6 +39,7 @@ class SegmentLayer: CALayer {
     static let innerRadiusKey = "innerRadius"
     static let outerRadiusKey = "outerRadius"
     static let colorKey = "color"
+    static let capType = "capType"
     
     static let animatableProperties = [colorKey, startAngleKey, endAngleKey, innerRadiusKey, outerRadiusKey]
   }
@@ -56,6 +57,13 @@ class SegmentLayer: CALayer {
   @NSManaged var innerRadius: CGFloat
   @NSManaged var outerRadius: CGFloat
   @NSManaged var color: CGColorRef
+  
+  @objc
+  enum SegmentCapType: Int {
+    case None, Begin, End, Middle, BothEnds
+  }
+  
+  @NSManaged var capType: SegmentCapType
   
   /**
    Default initialized for `SegmentLayer`, provides all necessary customization
@@ -95,6 +103,7 @@ class SegmentLayer: CALayer {
       self.outerRadius = layer.outerRadius
       self.innerRadius = layer.innerRadius
       self.color = layer.color
+      self.capType = layer.capType
     }
     self.commonInit()
   }
@@ -150,8 +159,7 @@ class SegmentLayer: CALayer {
       return animationForColor()
     }
     
-    outer: if PropertyKeys.animatableProperties.contains(event)
-    && event != PropertyKeys.colorKey {
+    outer: if PropertyKeys.animatableProperties.contains(event) {
       if shouldSkipAnimationOnEntry {
           break outer
       }
@@ -242,7 +250,8 @@ class SegmentLayer: CALayer {
   }
   
   override class func needsDisplayForKey(key: String) -> Bool {
-    if PropertyKeys.animatableProperties.contains(key) {
+    if PropertyKeys.animatableProperties.contains(key)
+      || key == PropertyKeys.capType {
       return true
     }
     return super.needsDisplayForKey(key)
