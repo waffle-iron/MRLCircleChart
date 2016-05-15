@@ -291,10 +291,24 @@ class SegmentLayer: CALayer {
     let outerStartPoint = pointOnCircle(outerRadius, startAngle)
     let innerEndPoint = pointOnCircle(innerRadius, endAngle)
     
+    func addCapToPath(path: UIBezierPath, angle: CGFloat, start: Bool) {
+      let capRadius = abs(outerRadius - innerRadius) / 2
+      let capCenterDistance = outerRadius - capRadius
+      let capStartAngle =  CGFloat(M_PI) + angle
+      let capEndAngle = CGFloat(M_PI * 2) + angle
+      path.addArcWithCenter(pointOnCircle(capCenterDistance, angle), radius: capRadius, startAngle: capStartAngle, endAngle: capEndAngle, clockwise: start)
+    }
+    
     let path = UIBezierPath()
     
     path.moveToPoint(innerStartPoint)
-    path.addLineToPoint(outerStartPoint)
+    
+    switch capType {
+    case .BothEnds, .Begin:
+      addCapToPath(path, angle: startAngle, start: true)
+    default:
+      path.addLineToPoint(outerStartPoint)
+    }
     
     path.addArcWithCenter(
       center,
@@ -303,8 +317,13 @@ class SegmentLayer: CALayer {
       endAngle: self.endAngle,
       clockwise: true
     )
-    
-    path.addLineToPoint(innerEndPoint)
+  
+    switch capType {
+    case .BothEnds, .End:
+      addCapToPath(path, angle: endAngle, start: false)
+    default:
+      path.addLineToPoint(innerEndPoint)
+    }
     
     path.addArcWithCenter(
       center,
