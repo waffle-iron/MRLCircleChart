@@ -230,12 +230,35 @@ public class Chart: UIView {
       layer.startAngle = source.startAngle(index)
       layer.endAngle = source.endAngle(index)
       layer.color = colorPallette[index].CGColor
-      
-      let firstLayer = chartSegmentLayers[0]
-      firstLayer.removeFromSuperlayer()
-      chartContainer.layer.addSublayer(firstLayer)
-      
-      initialAnimationComplete = true
+    }
+    
+    initialAnimationComplete = true
+    reassignSegmentLayerscapTypes()
+    
+  }
+  
+  private func reassignSegmentLayerscapTypes() {
+    
+    guard let source = dataSource where
+          chartSegmentLayers.count > 0 else {
+      return;
+    }
+    
+    for (index, segment) in chartSegmentLayers.enumerate() {
+      if source.isFullCircle() {
+        segment.capType = .None
+      } else {
+        switch index {
+        case 0:
+          segment.capType = chartSegmentLayers.count == 1 ? .BothEnds : .Begin
+        case chartSegmentLayers.count - 1 where chartSegmentLayers.count > 1:
+          segment.capType = .End
+          segment.removeFromSuperlayer()
+          chartContainer.layer.addSublayer(segment)
+        default:
+          segment.capType = .Middle
+        }
+      }
     }
   }
   
@@ -272,11 +295,13 @@ public class Chart: UIView {
       layer.animateRemoval(startAngle: startAngle, endAngle: endAngle, completion: {
         if (self.chartSegmentLayers.count > index) {
           self.chartSegmentLayers.removeAtIndex(index)
+          self.reassignSegmentLayerscapTypes()
         }
       })
     } else {
-      self.chartSegmentLayers.removeAtIndex(index)
+      chartSegmentLayers.removeAtIndex(index)
       layer.removeFromSuperlayer()
+      reassignSegmentLayerscapTypes()
     }
   }
   
