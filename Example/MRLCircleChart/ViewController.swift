@@ -55,6 +55,11 @@ class ViewController: UIViewController {
       tempChart.dataSource = dataSource
       tempChart.selectionStyle = .DesaturateNonSelected
       tempChart.delegate = self
+      
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+        // let's pretend our async API call has finished
+        tempChart.reloadData()
+      }
     }
   }
   
