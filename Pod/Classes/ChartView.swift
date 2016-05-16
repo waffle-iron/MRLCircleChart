@@ -115,7 +115,7 @@ public class Chart: UIView {
   
   override public func layoutSubviews() {
     super.layoutSubviews()
-    reloadData()
+    self.setupChartContainerIfNeeded()
   }
   
   //MARK: - Setup
@@ -139,6 +139,7 @@ public class Chart: UIView {
     
     if chartContainer.superview == nil {
       chartContainer.transform = CGAffineTransformMakeRotation(CGFloat(-M_PI_2))
+      
       addSubview(chartContainer)
       
       if chartBackgroundSegment == nil {
@@ -220,10 +221,16 @@ public class Chart: UIView {
         )
         chartContainer.layer.addSublayer(layer)
         chartSegmentLayers.append(layer)
-        layer.animateInsertion(
-          source.maxValue < source.totalValue() ? CGFloat(M_PI * 2) : source.startAngle(index),
-          endAngle: initialAnimationComplete ? nil : CGFloat(M_PI * 2)
-        )
+        
+        if initialAnimationComplete {
+          layer.animateInsertion(
+            source.isFullCircle() ? CGFloat(M_PI * 2) : source.startAngle(index),
+            endAngle: initialAnimationComplete ? nil : CGFloat(M_PI * 2)
+          )
+        } else {
+          layer.animateInsertion(0, endAngle: source.isFullCircle() ? 0 : CGFloat(M_PI * 2))
+        }
+        
         continue
       }
       
