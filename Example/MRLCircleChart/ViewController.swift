@@ -26,15 +26,15 @@ import UIKit
 import MRLCircleChart
 
 struct Data {
-  static let maxValue: UInt = 1000
-  static let values: [UInt] = [10, 20, 40, 30, 10, 80, 90, 100, 200, 250, 80, 90]
+  static let maxValue: Double = 1000
+  static let values: [Double] = [10, 20, 40, 30, 10, 80, 90, 100, 200, 250, 80, 90]
 }
 
 class DataSource: MRLCircleChart.DataSource {
   var chartSegments: [MRLCircleChart.Segment]
-  var maxValue: UInt
+  var maxValue: Double
   
-  init(items: [MRLCircleChart.Segment], maxValue: UInt) {
+  init(items: [MRLCircleChart.Segment], maxValue: Double) {
     self.chartSegments = items
     self.maxValue = maxValue
   }
@@ -59,7 +59,7 @@ class ViewController: UIViewController {
   }
   
   private func setupData() {
-    dataSource.chartSegments = Data.values.map { (value: UInt) -> MRLCircleChart.Segment in
+    dataSource.chartSegments = Data.values.map { (value: Double) -> MRLCircleChart.Segment in
       return MRLCircleChart.Segment(value: value, description: "value: \(value)")
     }.sort { $0 < $1 }
   }
@@ -83,7 +83,7 @@ class ViewController: UIViewController {
   }
   
   @IBAction func addItem(sender: UIButton) {
-    let value: UInt = UInt(random() % 75  + 25)
+    let value: Double = Double(random() % 75  + 25)
     dataSource.append(Segment(value: value, description: "value: \(value)"))
     dataSource.chartSegments.sortInPlace { $0 < $1 }
     chart!.reloadData()

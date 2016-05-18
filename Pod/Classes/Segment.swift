@@ -36,7 +36,7 @@ public class Segment: NSObject, Comparable {
   /**
    Value that the instance represents
    */
-  public var value: UInt
+  public var value: Double
   
   /**
    String description to accompany the `Segment's value
@@ -52,7 +52,7 @@ public class Segment: NSObject, Comparable {
   
    - returns: `Segment` instance
    */
-  required public init(value: UInt, description: String) {
+  required public init(value: Double, description: String) {
     self.value = value
     self.valueDescription = description
   }
@@ -69,3 +69,4 @@ public func <(lhs: Segment, rhs: Segment) -> Bool {
 public func >(lhs: Segment, rhs: Segment) -> Bool {
   return lhs.value > rhs.value
 }
+ 

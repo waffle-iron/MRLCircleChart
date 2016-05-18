@@ -26,7 +26,7 @@ import Foundation
 
 public protocol DataSource {
   var chartSegments: [Segment] { get set }
-  var maxValue: UInt { get set }
+  var maxValue: Double { get set }
 }
 
 extension DataSource {
@@ -54,14 +54,14 @@ extension DataSource {
     return index
   }
   
-  public func totalValue() -> UInt {
-    let value = chartSegments.reduce(0) { (sum, next) -> UInt in
+  public func totalValue() -> Double {
+    let value = chartSegments.reduce(0) { (sum, next) -> Double in
       return sum + next.value
     }
     return value
   }
   
-  public func maxValue() -> UInt {
+  public func maxValue() -> Double {
     return max(totalValue(), maxValue)
   }
   
@@ -105,7 +105,7 @@ extension DataSource {
     guard let segment = item(index) else {
       return 0
     }
-    let angle = Double(segment.value) / Double(maxValue()) * 2 * M_PI
+    let angle = segment.value / maxValue() * 2 * M_PI
     return CGFloat(angle)
   }
 }
