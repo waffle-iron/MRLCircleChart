@@ -206,6 +206,9 @@ public class Chart: UIView {
       return
     }
     
+    setupColorPallettes()
+    setupChartContainerIfNeeded()
+    
     let refNumber = max(source.numberOfItems(), chartSegmentLayers.count)
     
     for index in 0..<refNumber {
@@ -274,21 +277,22 @@ public class Chart: UIView {
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.25 * Double(NSEC_PER_SEC))), dispatch_get_main_queue(), {
         segment.removeFromSuperlayer()
         self.chartSegmentLayers.removeFirst()
-        
-        let segment = SegmentLayer(frame: self.chartContainer.bounds, start: 0, end: fromAngle, outerRadius: self.outerRadius, innerRadius: self.innerRadius, color: color.CGColor)
-        segment.capType = .BothEnds
-        segment.animationDuration = duration
-        
-        self.chartContainer.layer.addSublayer(segment)
-        self.chartSegmentLayers.append(segment)
-        
-        segment.animateRemoval(startAngle: 0, endAngle: 0) {
-          self.chartSegmentLayers.removeLast()
-          completion()
-        }
-        
       });
     }
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.25 * Double(NSEC_PER_SEC))), dispatch_get_main_queue(), {
+      let segment = SegmentLayer(frame: self.chartContainer.bounds, start: 0, end: fromAngle, outerRadius: self.outerRadius, innerRadius: self.innerRadius, color: color.CGColor)
+      segment.capType = .BothEnds
+      segment.animationDuration = duration
+      
+      self.chartContainer.layer.addSublayer(segment)
+      self.chartSegmentLayers.append(segment)
+      
+      segment.animateRemoval(startAngle: 0, endAngle: 0) {
+        self.chartSegmentLayers.removeLast()
+        completion()
+      }
+    });
   }
   
   
