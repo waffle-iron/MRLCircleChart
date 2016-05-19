@@ -143,8 +143,8 @@ public class Chart: UIView {
       addSubview(chartContainer)
       
       if chartBackgroundSegment == nil {
-        chartBackgroundSegment = SegmentLayer(frame: chartContainer.bounds, start: 0, end: CGFloat(M_PI * 2), outerRadius: outerRadius, innerRadius: innerRadius, color: chartBackgroundColor.CGColor)
-        chartContainer.layer.addSublayer(chartBackgroundSegment!)
+        chartBackgroundSegment = SegmentLayer(frame: chartContainer.frame, start: 0, end: CGFloat(M_PI * 2), outerRadius: outerRadius, innerRadius: innerRadius, color: chartBackgroundColor.CGColor)
+        self.layer.insertSublayer(chartBackgroundSegment!, below: chartContainer.layer)
       }
       
     }
@@ -163,6 +163,10 @@ public class Chart: UIView {
     }
   }
   
+  /**
+   Setups `colorPallette` based on `beginColor` and `endColor`. Also setups
+   `grayscalePallette` if not yet set up.
+   */
   private func setupColorPallettes() {
       
     guard let source = dataSource else {
@@ -197,9 +201,6 @@ public class Chart: UIView {
     guard let source = dataSource else {
       return
     }
-    
-    setupColorPallettes()
-    setupChartContainerIfNeeded()
     
     let refNumber = max(source.numberOfItems(), chartSegmentLayers.count)
     
@@ -273,7 +274,6 @@ public class Chart: UIView {
    Returns a `SegmentLayer?` for a given index
    
    - parameter index: Int, index to look at
-   
    - returns: an optional value that's `nil` when index is out of bounds, and 
    SegmentLayer when a value is found
    */
