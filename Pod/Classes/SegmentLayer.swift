@@ -58,6 +58,8 @@ class SegmentLayer: CALayer {
   @NSManaged var outerRadius: CGFloat
   @NSManaged var color: CGColorRef
   
+  public var animationDuration = Constants.animationDuration
+  
   @objc
   enum SegmentCapType: Int {
     case None, Begin, End, Middle, BothEnds
@@ -174,7 +176,7 @@ class SegmentLayer: CALayer {
    */
   func animation(key: String, toValue: AnyObject, fromValue: AnyObject) -> CABasicAnimation {
     let animation = CABasicAnimation(keyPath: key)
-    animation.duration = Constants.animationDuration
+    animation.duration = animationDuration
     animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
     animation.toValue = toValue
     animation.fromValue = fromValue
@@ -187,7 +189,7 @@ class SegmentLayer: CALayer {
    */
   func animationForAngle(key: String) -> CAAction {
     let animation = CABasicAnimation(keyPath: key)
-    animation.duration = Constants.animationDuration
+    animation.duration = animationDuration
     animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
     
     if let value = presentationLayer()?.valueForKey(key) {
@@ -204,7 +206,7 @@ class SegmentLayer: CALayer {
    */
   func animationForColor() -> CAAction {
     let animation = CABasicAnimation(keyPath: PropertyKeys.colorKey)
-    animation.duration = Constants.animationDuration
+    animation.duration = animationDuration
     animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
     
     if let value = presentationLayer()?.valueForKey(PropertyKeys.colorKey) {
