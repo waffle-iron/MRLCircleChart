@@ -45,7 +45,11 @@ public class Chart: UIView {
   
   //MARK: - Public variables
   
-  public var dataSource: DataSource?
+  public var dataSource: DataSource? {
+    didSet {
+      setupColorPallettes()
+    }
+  }
   public var delegate: Delegate?
   public var selectionStyle: SegmentSelectionStyle = .None
   
@@ -242,13 +246,59 @@ public class Chart: UIView {
     
     initialAnimationComplete = true
     reassignSegmentLayerscapTypes()
-    
   }
   
+  /**
+   A utility function to perform a one-shot animation of a single segment 
+   that does not need to be based on `dataSource` values. 
+   You can use it to convey states such as depletion through animation without
+   relying on faux `dataSource`. 
+   
+   **Note**: this will remove all segments from your chart but one, you can rely on
+   the `completion` closure to reload your data
+   
+   - parameter color:       `UIColor` used for the segment
+   - parameter fromPercent: value between 1-100, representing starting angle
+   - parameter duration: duration of the animation
+   - parameter completion:  completion, run when segment is removed
+   */
+  public func animateDepletion(color: UIColor, fromPercent: CGFloat = 100, duration: Double = 1.0, completion: () -> () = {}) {
+    
+    let fromAngle = fromPercent/100 * CGFloat(M_PI * 2)
+    
+    for segment in chartSegmentLayers {
+      segment.animationDuration = 0.25
+      segment.color = color.CGColor
+      segment.endAngle = fromAngle
+      
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.25 * Double(NSEC_PER_SEC))), dispatch_get_main_queue(), {
+        segment.removeFromSuperlayer()
+        self.chartSegmentLayers.removeFirst()
+        
+        let segment = SegmentLayer(frame: self.chartContainer.bounds, start: 0, end: fromAngle, outerRadius: self.outerRadius, innerRadius: self.innerRadius, color: color.CGColor)
+        segment.capType = .BothEnds
+        segment.animationDuration = duration
+        
+        self.chartContainer.layer.addSublayer(segment)
+        self.chartSegmentLayers.append(segment)
+        
+        segment.animateRemoval(startAngle: 0, endAngle: 0) {
+          self.chartSegmentLayers.removeLast()
+          completion()
+        }
+        
+      });
+    }
+  }
+  
+  
+  //MARK: - Layer manipulation
+  /**
+   Loops through the available layers and assigns them appropriate end cap type
+   */
   private func reassignSegmentLayerscapTypes() {
     
-    guard let source = dataSource where
-          chartSegmentLayers.count > 0 else {
+    guard let source = dataSource else {
       return;
     }
     
@@ -315,7 +365,12 @@ public class Chart: UIView {
   //MARK: - Touches
   
   override public func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-    guard let touch = touches.first else {
+    guard let touch = touches.first,
+          let source = dataSource else {
+      return
+    }
+    
+    guard source.numberOfItems() > 0 else {
       return
     }
     
