@@ -68,10 +68,10 @@ extension UIColor {
     var result:[UIColor] = []
     
     for index in 0..<count {
-      var red = br - (br - er) / CGFloat(count) * CGFloat(index)
-      var green = bg - (bg - eg) / CGFloat(count) * CGFloat(index)
-      var blue = bb - (bb - eb) / CGFloat(count) * CGFloat(index)
-      var alpha = ba - (ba - ea) / CGFloat(count) * CGFloat(index)
+      let red = br - (br - er) / CGFloat(count) * CGFloat(index)
+      let green = bg - (bg - eg) / CGFloat(count) * CGFloat(index)
+      let blue = bb - (bb - eb) / CGFloat(count) * CGFloat(index)
+      let alpha = ba - (ba - ea) / CGFloat(count) * CGFloat(index)
       
       let color = UIColor(red:red, green:green, blue:blue, alpha:alpha)
       
@@ -117,11 +117,10 @@ extension NSCoder {
    so on.
    */
   func encodeCGColorRef(ref: CGColorRef, key: NSString) {
-    let components = CGColorGetComponents(ref)
-    self.encodeFloat(Float(components[0]), forKey: "\(key)_red")
-    self.encodeFloat(Float(components[1]), forKey: "\(key)_green")
-    self.encodeFloat(Float(components[2]), forKey: "\(key)_blue")
-    self.encodeFloat(Float(components[3]), forKey: "\(key)_alpha")
+    self.encodeFloat(Float(CGColorGetComponents(ref)[0]), forKey: "\(key)_red")
+    self.encodeFloat(Float(CGColorGetComponents(ref)[1]), forKey: "\(key)_green")
+    self.encodeFloat(Float(CGColorGetComponents(ref)[2]), forKey: "\(key)_blue")
+    self.encodeFloat(Float(CGColorGetComponents(ref)[3]), forKey: "\(key)_alpha")
   }
   /**
    Decodes and returns a `CGColorRef` whose four color components were 
@@ -135,8 +134,6 @@ extension NSCoder {
     let green = CGFloat(self.decodeFloatForKey("\(key)_green"))
     let blue = CGFloat(self.decodeFloatForKey("\(key)_blue"))
     let alpha = CGFloat(self.decodeFloatForKey("\(key)_alpha"))
-    
-    let components = [red, green, blue, alpha]
     
     return UIColor(red: red, green: green, blue: blue, alpha: alpha).CGColor
   }

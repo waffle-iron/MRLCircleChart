@@ -45,13 +45,9 @@ public class Chart: UIView {
   
   //MARK: - Public variables
   
-  public var dataSource: DataSource? {
-    didSet {
-      setupColorPallettes()
-    }
-  }
+  public var dataSource: DataSource?
   public var delegate: Delegate?
-  public var selectionStyle: SegmentSelectionStyle = .None
+  public var selectionStyle: SegmentSelectionStyle = .DesaturateNonSelected
   
   //MARK: - Public Inspectables
   
@@ -249,6 +245,25 @@ public class Chart: UIView {
     
     initialAnimationComplete = true
     reassignSegmentLayerscapTypes()
+  }
+  
+  public func animateSegments(color: UIColor?, startAngle: CGFloat?, endAngle: CGFloat?, completion: () -> () = {}) {
+    CATransaction.begin()
+    CATransaction.setCompletionBlock({
+      completion()
+    })
+    for segment in chartSegmentLayers {
+      if let segmentColor = color {
+        segment.color = segmentColor.CGColor
+      }
+      if let segmentStartAngle = startAngle {
+        segment.startAngle = segmentStartAngle
+      }
+      if let segmentEndAngle = endAngle {
+        segment.endAngle = segmentEndAngle
+      }
+    }
+    CATransaction.commit()
   }
   
   /**

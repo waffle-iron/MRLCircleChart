@@ -72,7 +72,7 @@ extension DataSource {
   //MARK: - Data Manipulation
   
   public mutating func remove(index: Int) -> Segment? {
-    guard let item = item(index) else {
+    guard let _ = item(index) else {
       return nil
     }
     return chartSegments.removeAtIndex(index)

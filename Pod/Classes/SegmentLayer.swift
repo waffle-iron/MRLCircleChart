@@ -58,7 +58,7 @@ class SegmentLayer: CALayer {
   @NSManaged var outerRadius: CGFloat
   @NSManaged var color: CGColorRef
   
-  public var animationDuration = Constants.animationDuration
+  var animationDuration: Double = Constants.animationDuration
   
   @objc
   enum SegmentCapType: Int {
@@ -238,10 +238,10 @@ class SegmentLayer: CALayer {
   
   /**
    Animates the insertion of the layer, given an initial `startAngle` and, 
-   optionally, an initial `endAngle` (defaults to 0).
+   optionally, an initial `endAngle` (defaults to startAngle).
    */
   func animateInsertion(startAngle: CGFloat, endAngle: CGFloat? = nil) {
-    var initialEndAngle = endAngle == nil ? startAngle : endAngle!
+    let initialEndAngle = endAngle == nil ? startAngle : endAngle!
     
     CATransaction.begin()
     
