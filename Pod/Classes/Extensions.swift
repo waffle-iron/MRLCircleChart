@@ -39,54 +39,54 @@ struct HSBComponents {
 
 extension UIColor {
   /**
-   Calculates a range of colours between `beginColour` and `endColour` with 
+   Calculates a range of colours between `beginColour` and `endColour` with
    number of steps equal to `count` and steps distributed evenly.
-   
+
    - parameter beginColor: first colour in the returned `Array`
    - parameter endColor:   final colour in the returned `Array`
    - parameter count:      number of colours in the returned `Array`
-  
+
    - returns: `[UIColor]` with number of items equal to `count`, containing a
    'gradient' of colour values between `beginColor` and `endColor`
    */
   class func colorRange(beginColor beginColor: UIColor, endColor: UIColor, count: Int) -> [UIColor] {
-    
+
     var br: CGFloat = 0
     var bg: CGFloat = 0
     var bb: CGFloat = 0
     var ba: CGFloat = 0
-    
+
     beginColor.getRed(&br, green: &bg, blue: &bb, alpha: &ba)
-    
+
     var er: CGFloat = 0
     var eg: CGFloat = 0
     var eb: CGFloat = 0
     var ea: CGFloat = 0
-    
+
     endColor.getRed(&er, green: &eg, blue: &eb, alpha: &ea)
-    
-    var result:[UIColor] = []
-    
+
+    var result: [UIColor] = []
+
     for index in 0..<count {
       let red = br - (br - er) / CGFloat(count) * CGFloat(index)
       let green = bg - (bg - eg) / CGFloat(count) * CGFloat(index)
       let blue = bb - (bb - eb) / CGFloat(count) * CGFloat(index)
       let alpha = ba - (ba - ea) / CGFloat(count) * CGFloat(index)
-      
+
       let color = UIColor(red:red, green:green, blue:blue, alpha:alpha)
-      
+
       result.append(color)
     }
-    
+
     return result
   }
-  
+
   func desaturated() -> UIColor {
     var components = self.getHSBComponents()
     components.s = 0
     return UIColor.fromHSBComponents(components)
   }
-  
+
   func getHSBComponents() -> HSBComponents {
     var components = HSBComponents(h: 0, s: 0, b: 0, a: 0)
     self.getHue(
@@ -97,7 +97,7 @@ extension UIColor {
     )
     return components
   }
-  
+
   static func fromHSBComponents(components: HSBComponents) -> UIColor {
     return UIColor(
       hue: components.h,
@@ -106,13 +106,12 @@ extension UIColor {
       alpha: components.a
     )
   }
-  
 }
 
 extension NSCoder {
   /**
    Encodes `ref` and associates it with four different keys, one per each
-   colour component (red, green, blue, alpha), with key names based on the 
+   colour component (red, green, blue, alpha), with key names based on the
    provided `key` such as: red component is encoded under `"\(key)_red"` key and
    so on.
    */
@@ -123,10 +122,10 @@ extension NSCoder {
     self.encodeFloat(Float(CGColorGetComponents(ref)[3]), forKey: "\(key)_alpha")
   }
   /**
-   Decodes and returns a `CGColorRef` whose four color components were 
-   previously encoded under keys derived from the given `key` such as red 
+   Decodes and returns a `CGColorRef` whose four color components were
+   previously encoded under keys derived from the given `key` such as red
    component was encoded under `"\(key)_red"` key and so on.
-   
+
    - returns: CGColorRef recontructed for a given `key`
    */
   func decodeCGColorRefForKey(key: NSString) -> CGColorRef {
@@ -134,7 +133,7 @@ extension NSCoder {
     let green = CGFloat(self.decodeFloatForKey("\(key)_green"))
     let blue = CGFloat(self.decodeFloatForKey("\(key)_blue"))
     let alpha = CGFloat(self.decodeFloatForKey("\(key)_alpha"))
-    
+
     return UIColor(red: red, green: green, blue: blue, alpha: alpha).CGColor
   }
 }
@@ -143,7 +142,7 @@ extension CGPoint {
   /**
    Calculates a midpoint located between the two given points, `lhs` and `rhs`. Sequence of
    arguments given is unimportant.
-   
+
    - returns: CGPoint calculated by averaging given points.
    */
   public static func midPoint(lhs: CGPoint, rhs: CGPoint) -> CGPoint {
