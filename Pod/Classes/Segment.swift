@@ -32,24 +32,24 @@ import Foundation
  property, and `Equatable` on both `value` and `description properties.
  */
 public class Segment: NSObject, Comparable {
-  
+
   /**
    Value that the instance represents
    */
   public var value: Double
-  
+
   /**
    String description to accompany the `Segment's value
    */
   public var valueDescription: String
-  
+
   /**
    Default initializer for the `Segment` class, returns a fully configured
    instance.
-   
+
    - parameter value:       UInt, value to represent
    - parameter description: String, description to accompany `Segment's` value
-  
+
    - returns: `Segment` instance
    */
   required public init(value: Double, description: String) {
@@ -58,15 +58,14 @@ public class Segment: NSObject, Comparable {
   }
 }
 
-public func ==(lhs: Segment, rhs: Segment) -> Bool {
+public func == (lhs: Segment, rhs: Segment) -> Bool {
   return lhs.value == rhs.value && lhs.valueDescription == rhs.valueDescription
 }
 
-public func <(lhs: Segment, rhs: Segment) -> Bool {
+public func < (lhs: Segment, rhs: Segment) -> Bool {
   return lhs.value < rhs.value
 }
 
-public func >(lhs: Segment, rhs: Segment) -> Bool {
+public func > (lhs: Segment, rhs: Segment) -> Bool {
   return lhs.value > rhs.value
 }
- 

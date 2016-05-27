@@ -27,7 +27,3 @@ import Foundation
 public protocol Delegate {
   func chartDidSelectItem(index: Int)
 }
-
-extension Delegate {
-  func didSelectItem(index: Int) { return }
-}

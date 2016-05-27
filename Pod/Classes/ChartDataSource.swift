@@ -30,13 +30,13 @@ public protocol DataSource {
 }
 
 extension DataSource {
-  
+
   //MARK: - Item Helpers
-  
+
   public func numberOfItems() -> Int {
     return chartSegments.count
   }
-  
+
   public func item(index: Int) -> Segment? {
     guard index < chartSegments.count
           && index >= 0 else {
@@ -46,48 +46,48 @@ extension DataSource {
   }
 
   public func indexOf(item: Segment) -> Int {
-    guard let index = chartSegments.indexOf( { (itemToCheck: Segment) -> Bool in
+    guard let index = chartSegments.indexOf({ (itemToCheck: Segment) -> Bool in
       return itemToCheck == item
     }) else {
       return NSNotFound
     }
     return index
   }
-  
+
   public func totalValue() -> Double {
     let value = chartSegments.reduce(0) { (sum, next) -> Double in
       return sum + next.value
     }
     return value
   }
-  
+
   public func maxValue() -> Double {
     return max(totalValue(), maxValue)
   }
-  
+
   public func isFullCircle() -> Bool {
     return maxValue <= totalValue()
   }
-  
+
   //MARK: - Data Manipulation
-  
+
   public mutating func remove(index: Int) -> Segment? {
-    guard let item = item(index) else {
+    guard let _ = item(index) else {
       return nil
     }
     return chartSegments.removeAtIndex(index)
   }
-  
+
   public mutating func insert(item: Segment, index: Int) {
     chartSegments.insert(item, atIndex: index)
   }
-  
+
   public mutating func append(item: Segment) {
     chartSegments.append(item)
   }
-  
+
   //MARK: - Angle Helpers
-  
+
   func startAngle(index: Int) -> CGFloat {
     let rangeBounds = min(chartSegments.count, index)
     let slice = chartSegments[0..<rangeBounds]
@@ -96,11 +96,11 @@ extension DataSource {
     }
     return angle
   }
-  
+
   func endAngle(index: Int) -> CGFloat {
-    return startAngle(index) + arcAngle(index) + 0.003 // Extends endAngle to avoid unsighlty gaps between segments that are caused by antialiasing
+    return startAngle(index) + arcAngle(index)
   }
-  
+
   func arcAngle(index: Int) -> CGFloat {
     guard let segment = item(index) else {
       return 0

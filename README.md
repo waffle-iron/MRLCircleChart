@@ -5,11 +5,9 @@
 [![License](https://img.shields.io/cocoapods/l/MRLCircleChart.svg?style=flat)](http://cocoapods.org/pods/MRLCircleChart)
 [![Platform](https://img.shields.io/cocoapods/p/MRLCircleChart.svg?style=flat)](http://cocoapods.org/pods/MRLCircleChart)
 
-## Usage
+## Demo
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
-
-## Requirements
+To run the example project, clone the repo, and run `pod install` from the Example directory first, or run `pod try MRLCircleChart` to check it with a temporary clone.
 
 ## Installation
 

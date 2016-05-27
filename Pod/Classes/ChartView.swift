@@ -24,7 +24,7 @@
 
 import UIKit
 
-/* 
+/*
  * Provides keys for easy access to Chart properties
  */
 private enum ChartProperties {
@@ -42,19 +42,15 @@ private enum ChartProperties {
  */
 @objc
 public class Chart: UIView {
-  
+
   //MARK: - Public variables
-  
-  public var dataSource: DataSource? {
-    didSet {
-      setupColorPallettes()
-    }
-  }
+
+  public var dataSource: DataSource?
   public var delegate: Delegate?
-  public var selectionStyle: SegmentSelectionStyle = .None
-  
+  public var selectionStyle: SegmentSelectionStyle = .DesaturateNonSelected
+
   //MARK: - Public Inspectables
-  
+
   @IBInspectable public var innerRadius: CGFloat = 0
   @IBInspectable public var outerRadius: CGFloat = 0
   @IBInspectable public var chartBackgroundColor: UIColor = UIColor(white: 0.7, alpha: 0.66)
@@ -64,9 +60,9 @@ public class Chart: UIView {
   @IBInspectable public var endColor: UIColor? {
     didSet { reloadData() }
   }
-  
+
   //MARK: - Private variables
-  
+
   private let chartContainer = UIView()
   private var chartBackgroundSegment: SegmentLayer?
   private var chartSegmentLayers: [SegmentLayer] = []
@@ -74,31 +70,31 @@ public class Chart: UIView {
   private var innerRadiusRatio: CGFloat = 0.0
   private var colorPallette: [UIColor] = []
   private var grayscalePallette: [UIColor] = []
-  
+
   //MARK: - Initializers
-  
+
   /**
    Default initializer for ChartView, provides most of the customization points
-  
+
    Note: `innerRadius` and `outerRadius` are initially used to calculate a ratio
    of these values to overal chart frame, so that the chart is sized correclty
    when changes to the frame are made
-   
-   Note: `beginColor` and `endColor` are used to derive a range, or gradient of 
+
+   Note: `beginColor` and `endColor` are used to derive a range, or gradient of
    colors, that provide a smooth transition between each segment
-   
-   - parameter frame:       frame used to display the chart view; since chart 
-   itself requires square bounds, the greates square frame that fits in the 
+
+   - parameter frame:       frame used to display the chart view; since chart
+   itself requires square bounds, the greates square frame that fits in the
    frame is derived and centered in chart frame
-   - parameter innerRadius: if larger than 0, defines the radius of an inner 
+   - parameter innerRadius: if larger than 0, defines the radius of an inner
    'hole' in the chart
-   - parameter outerRadius: defines the outer radius of the chart, should be 
+   - parameter outerRadius: defines the outer radius of the chart, should be
    greater than `innerRadius`
    - parameter dataSource:  `DataSource` complying object that provides all
    data details for the chart view
    - parameter beginColor:  color of the first chart segment layer
    - parameter endColor:    color of the last chart segment layer
-   
+
    - returns: fully configured chart view
    */
   public required init(frame: CGRect, innerRadius: CGFloat, outerRadius: CGFloat, dataSource: DataSource, beginColor: UIColor = UIColor.greenColor(), endColor: UIColor = UIColor.yellowColor()) {
@@ -107,117 +103,114 @@ public class Chart: UIView {
     self.dataSource = dataSource
     self.beginColor = beginColor
     self.endColor = endColor
-    
+
     super.init(frame: frame)
   }
-  
+
   public required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
   }
-  
+
   //MARK: - Public Overrides
-  
+
   override public func layoutSubviews() {
     super.layoutSubviews()
     self.setupChartContainerIfNeeded()
   }
-  
+
   //MARK: - Setup
-  
+
   /**
    Calculates the view that will hold individual `SegmentLayers` as well as
    the square frame for that view, in such a way that it fills the most of the
-   available frame. 
-   
-   This is also used to resize the container appropriately with bounds changes, 
-   as well as for the intial configuration of `outerRadiusRatio` and 
-   `innerRadiusRatio`.
+   available frame.
+
+   This is also used to resize the container appropriately with bounds changes,
+   as well as for the intial configuration of `outerRadiusRatio` and `innerRadiusRatio`.
    */
   private func setupChartContainerIfNeeded() {
-    
+
     let squareSide = min(frame.size.width, frame.size.height)
     let squaredBounds = CGRect(origin: CGPointZero, size: CGSize(width: squareSide, height: squareSide))
-    
+
     chartContainer.bounds = squaredBounds
     chartContainer.center = bounds.center()
-    
+
     if chartContainer.superview == nil {
       chartContainer.transform = CGAffineTransformMakeRotation(CGFloat(-M_PI_2))
-      
+
       addSubview(chartContainer)
-      
+
       if chartBackgroundSegment == nil {
         chartBackgroundSegment = SegmentLayer(frame: chartContainer.frame, start: 0, end: CGFloat(M_PI * 2), outerRadius: outerRadius, innerRadius: innerRadius, color: chartBackgroundColor.CGColor)
         self.layer.insertSublayer(chartBackgroundSegment!, below: chartContainer.layer)
       }
-      
+
     }
-    
+
     if outerRadiusRatio == 0 {
       outerRadiusRatio = outerRadius / (chartContainer.frame.size.width / 2)
     }
-    
+
     if innerRadiusRatio == 0 {
       innerRadiusRatio = innerRadius / (chartContainer.frame.size.width / 2)
     }
-    
+
     for layer in chartSegmentLayers {
       layer.frame = chartContainer.bounds
       layer.position = chartContainer.bounds.center()
     }
   }
-  
+
   /**
    Setups `colorPallette` based on `beginColor` and `endColor`. Also setups
    `grayscalePallette` if not yet set up.
    */
   private func setupColorPallettes() {
-      
+
     guard let source = dataSource else {
       return
     }
-    
+
     colorPallette = UIColor.colorRange(
       beginColor: beginColor!,
       endColor: endColor!,
       count: source.numberOfItems()
     )
-    
+
     grayscalePallette = UIColor.colorRange(
       beginColor: UIColor(white: 0.6, alpha: 0.5),
       endColor: UIColor(white: 0.2, alpha: 0.5),
       count: source.numberOfItems()
     )
   }
-  
+
   /**
-   A flag used to distinguish the entry animation (adding elements, clockwise) 
-   from animation used for individual elements (adding elements, 
-   counterclockwise).
+   A flag used to distinguish the entry animation (adding elements, clockwise)
+   from animation used for individual elements (adding elements, counterclockwise).
    */
   private var initialAnimationComplete = false
-  
+
   /**
-   Querries the `dataSource` for data and inserts, removes, or updates all 
-   relevant segments.
+   Querries the `dataSource` for data and inserts, removes, or updates all relevant segments.
    */
   final public func reloadData() {
     guard let source = dataSource else {
       return
     }
-    
+
     setupColorPallettes()
     setupChartContainerIfNeeded()
-    
+
     let refNumber = max(source.numberOfItems(), chartSegmentLayers.count)
-    
+
     for index in 0..<refNumber {
       guard let _ = source.item(index) else {
         let targetAngle = source.maxValue > source.totalValue() ? source.startAngle(index) : CGFloat(M_PI * 2)
         remove(index, startAngle: targetAngle, endAngle: targetAngle)
         continue
       }
-      
+
       guard let layer = layer(index) else {
         let layer = SegmentLayer(
           frame: chartContainer.bounds,
@@ -229,7 +222,7 @@ public class Chart: UIView {
         )
         chartContainer.layer.addSublayer(layer)
         chartSegmentLayers.append(layer)
-        
+
         if initialAnimationComplete {
           layer.animateInsertion(
             source.isFullCircle() ? CGFloat(M_PI * 2) : source.startAngle(index),
@@ -238,74 +231,92 @@ public class Chart: UIView {
         } else {
           layer.animateInsertion(0, endAngle: source.isFullCircle() ? 0 : CGFloat(M_PI * 2))
         }
-        
+
         continue
       }
-      
+
       layer.startAngle = source.startAngle(index)
       layer.endAngle = source.endAngle(index)
       layer.color = colorPallette[index].CGColor
     }
-    
+
     initialAnimationComplete = true
     reassignSegmentLayerscapTypes()
   }
-  
+
+  public func animateSegments(color: UIColor?, startAngle: CGFloat?, endAngle: CGFloat?, completion: () -> () = {}) {
+    CATransaction.begin()
+    CATransaction.setCompletionBlock({
+      completion()
+    })
+    for segment in chartSegmentLayers {
+      if let segmentColor = color {
+        segment.color = segmentColor.CGColor
+      }
+      if let segmentStartAngle = startAngle {
+        segment.startAngle = segmentStartAngle
+      }
+      if let segmentEndAngle = endAngle {
+        segment.endAngle = segmentEndAngle
+      }
+    }
+    CATransaction.commit()
+  }
+
   /**
-   A utility function to perform a one-shot animation of a single segment 
-   that does not need to be based on `dataSource` values. 
+   A utility function to perform a one-shot animation of a single segment
+   that does not need to be based on `dataSource` values.
    You can use it to convey states such as depletion through animation without
-   relying on faux `dataSource`. 
-   
+   relying on faux `dataSource`.
+
    **Note**: this will remove all segments from your chart but one, you can rely on
    the `completion` closure to reload your data
-   
+
    - parameter color:       `UIColor` used for the segment
    - parameter fromPercent: value between 1-100, representing starting angle
    - parameter duration: duration of the animation
    - parameter completion:  completion, run when segment is removed
    */
   public func animateDepletion(color: UIColor, fromPercent: CGFloat = 100, duration: Double = 1.0, completion: () -> () = {}) {
-    
+
     let fromAngle = fromPercent/100 * CGFloat(M_PI * 2)
-    
+
     for segment in chartSegmentLayers {
       segment.animationDuration = 0.25
       segment.color = color.CGColor
       segment.endAngle = fromAngle
-      
+
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.25 * Double(NSEC_PER_SEC))), dispatch_get_main_queue(), {
         segment.removeFromSuperlayer()
         self.chartSegmentLayers.removeFirst()
-      });
+      })
     }
-    
+
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.25 * Double(NSEC_PER_SEC))), dispatch_get_main_queue(), {
       let segment = SegmentLayer(frame: self.chartContainer.bounds, start: 0, end: fromAngle, outerRadius: self.outerRadius, innerRadius: self.innerRadius, color: color.CGColor)
       segment.capType = .BothEnds
       segment.animationDuration = duration
-      
+
       self.chartContainer.layer.addSublayer(segment)
       self.chartSegmentLayers.append(segment)
-      
+
       segment.animateRemoval(startAngle: 0, endAngle: 0) {
         self.chartSegmentLayers.removeLast()
         completion()
       }
-    });
+    })
   }
-  
-  
+
   //MARK: - Layer manipulation
   /**
    Loops through the available layers and assigns them appropriate end cap type
    */
   private func reassignSegmentLayerscapTypes() {
-    
+
     guard let source = dataSource else {
-      return;
+      return
     }
-    
+
     for (index, segment) in chartSegmentLayers.enumerate() {
       if source.isFullCircle() {
         segment.capType = .None
@@ -323,12 +334,12 @@ public class Chart: UIView {
       }
     }
   }
-  
+
   /**
    Returns a `SegmentLayer?` for a given index
-   
+
    - parameter index: Int, index to look at
-   - returns: an optional value that's `nil` when index is out of bounds, and 
+   - returns: an optional value that's `nil` when index is out of bounds, and
    SegmentLayer when a value is found
    */
   private func layer(index: Int) -> SegmentLayer? {
@@ -338,23 +349,23 @@ public class Chart: UIView {
       return chartSegmentLayers[index]
     }
   }
-  
+
   /**
    Removes the layer at a given index
-   
+
    - parameter index:    index to remove
-   - parameter animated: defaults to `true`, specifies whether the removal 
+   - parameter animated: defaults to `true`, specifies whether the removal
    should be animated
    */
   private func remove(index: Int, startAngle: CGFloat = CGFloat(M_PI * 2), endAngle: CGFloat = CGFloat(M_PI * 2), animated: Bool = true) {
-    
+
     guard let layer = layer(index) else {
       return
     }
-    
+
     if animated {
       layer.animateRemoval(startAngle: startAngle, endAngle: endAngle, completion: {
-        if (self.chartSegmentLayers.count > index) {
+        if self.chartSegmentLayers.count > index {
           self.chartSegmentLayers.removeAtIndex(index)
           self.reassignSegmentLayerscapTypes()
         }
@@ -365,21 +376,21 @@ public class Chart: UIView {
       reassignSegmentLayerscapTypes()
     }
   }
-  
+
   //MARK: - Touches
-  
+
   override public func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
     guard let touch = touches.first,
           let source = dataSource else {
       return
     }
-    
+
     guard source.numberOfItems() > 0 else {
       return
     }
-    
+
     let point = self.convertPoint(touch.locationInView(self), toCoordinateSpace: chartContainer)
-    
+
     for (index, layer) in chartSegmentLayers.enumerate() {
       if layer.containsPoint(point) {
         guard let del = delegate else {
@@ -388,7 +399,7 @@ public class Chart: UIView {
         del.chartDidSelectItem(index)
       }
     }
-    
+
     switch selectionStyle {
     case .None:
       break
@@ -400,18 +411,18 @@ public class Chart: UIView {
       break
     case .DesaturateNonSelected:
       var select = false
-      
+
       for layer in chartSegmentLayers {
         layer.selected = layer.containsPoint(point) ? !layer.selected : false
       }
-      
+
       for layer in chartSegmentLayers {
         if layer.selected {
           select = layer.selected
           break
         }
       }
-      
+
       for (index, layer) in chartSegmentLayers.enumerate() {
         if select {
           layer.color = layer.containsPoint(point) ? colorPallette[index].CGColor : grayscalePallette[index].CGColor
