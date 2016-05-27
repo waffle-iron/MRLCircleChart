@@ -7,24 +7,22 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = "MRLCircleChart"
-  s.version          = "0.0.1"
-  s.summary          = "Small and very opinionated pie-chart view written in Swift."
+  s.name             = 'MRLCircleChart'
+  s.version          = '0.0.1'
+  s.summary          = 'Small and very opinionated pie-chart view written in Swift. '
 
   s.description      = <<-DESC
   Work in progress. Written for a secret project.
                        DESC
 
-  s.homepage         = "https://github.com/mlisik/MRLCircleChart.git"
+  s.homepage         = 'https://github.com/mlisik/MRLCircleChart.git'
   # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
   s.license          = 'MIT'
-  s.author           = { "mlisik" => "marek.lisik@holdapp.pl" }
-  s.source           = { :git => "https://github.com/mlisik/MRLCircleChart.git", :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+  s.author           = { 'mlisik' => 'marek.lisik@holdapp.pl' }
+  s.source           = { git: 'https://github.com/mlisik/MRLCircleChart.git', tag: s.version.to_s }
 
   s.platform     = :ios, '8.0'
   s.requires_arc = true
 
   s.source_files = 'Pod/Classes/**/*'
-  # s.public_header_files = 'Pod/Classes/**/*.h'
 end
