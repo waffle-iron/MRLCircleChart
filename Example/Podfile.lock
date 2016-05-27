@@ -1,12 +1,8 @@
 PODS:
   - MRLCircleChart (0.0.1)
-  - Nimble (3.2.0)
-  - Quick (0.9.1)
 
 DEPENDENCIES:
   - MRLCircleChart (from `../`)
-  - Nimble (~> 3.0)
-  - Quick (~> 0.8)
 
 EXTERNAL SOURCES:
   MRLCircleChart:
@@ -14,9 +10,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   MRLCircleChart: 9b21faffd4513b2f3c01740dbc3dd4c9a39730ea
-  Nimble: 703854335d181df169bbca9c97117b5cf8c47c1d
-  Quick: a5221fc21788b6aeda934805e68b061839bc3165
 
-PODFILE CHECKSUM: 11b796baa0752df30e14f1a0ae93508ae61b833c
+PODFILE CHECKSUM: 3c15a8130b10778c5845572f90d60f6eef7c7522
 
 COCOAPODS: 1.0.0
