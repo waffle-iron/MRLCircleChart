@@ -54,13 +54,9 @@ public class Chart: UIView {
   @IBInspectable public var innerRadius: CGFloat = 0
   @IBInspectable public var outerRadius: CGFloat = 0
   @IBInspectable public var chartBackgroundColor: UIColor = UIColor(white: 0.7, alpha: 0.66)
-  @IBInspectable public var beginColor: UIColor? {
-    didSet { reloadData() }
-  }
-  @IBInspectable public var endColor: UIColor? {
-    didSet { reloadData() }
-  }
-
+  @IBInspectable public var beginColor: UIColor?
+  @IBInspectable public var endColor: UIColor?
+  
   //MARK: - Private variables
 
   private let chartContainer = UIView()
