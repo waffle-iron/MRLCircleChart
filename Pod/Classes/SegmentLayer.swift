@@ -117,13 +117,6 @@ class SegmentLayer: CALayer {
 
   required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
-
-    self.color = aDecoder.decodeCGColorRefForKey(PropertyKeys.colorKey)
-    self.startAngle = CGFloat(aDecoder.decodeFloatForKey(PropertyKeys.startAngleKey))
-    self.endAngle = CGFloat(aDecoder.decodeFloatForKey(PropertyKeys.endAngleKey))
-    self.outerRadius = CGFloat(aDecoder.decodeFloatForKey(PropertyKeys.outerRadiusKey))
-    self.innerRadius = CGFloat(aDecoder.decodeFloatForKey(PropertyKeys.innerRadiusKey))
-
     self.commonInit()
   }
 
@@ -136,11 +129,7 @@ class SegmentLayer: CALayer {
   }
 
   override func encodeWithCoder(aCoder: NSCoder) {
-    aCoder.encodeFloat(Float(startAngle), forKey: PropertyKeys.startAngleKey)
-    aCoder.encodeFloat(Float(endAngle), forKey: PropertyKeys.endAngleKey)
-    aCoder.encodeFloat(Float(outerRadius), forKey: PropertyKeys.outerRadiusKey)
-    aCoder.encodeFloat(Float(innerRadius), forKey: PropertyKeys.innerRadiusKey)
-    aCoder.encodeCGColorRef(self.color, key: PropertyKeys.colorKey)
+    super.encodeWithCoder(aCoder)
   }
 
   //MARK: - Animation Overrides
@@ -247,12 +236,8 @@ class SegmentLayer: CALayer {
   func animateInsertion(startAngle: CGFloat, endAngle: CGFloat? = nil) {
     let initialEndAngle = endAngle == nil ? startAngle : endAngle!
 
-    CATransaction.begin()
-
     self.addAnimation(animation(PropertyKeys.startAngleKey, toValue: self.startAngle, fromValue: startAngle), forKey: PropertyKeys.startAngleKey)
     self.addAnimation(animation(PropertyKeys.endAngleKey, toValue: self.endAngle, fromValue: initialEndAngle), forKey: PropertyKeys.endAngleKey)
-
-    CATransaction.commit()
   }
 
   override class func needsDisplayForKey(key: String) -> Bool {
