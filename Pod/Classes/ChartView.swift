@@ -121,18 +121,19 @@ public class Chart: UIView {
     let squareSide = min(frame.size.width, frame.size.height)
     let squaredBounds = CGRect(origin: CGPointZero, size: CGSize(width: squareSide, height: squareSide))
 
-    chartContainer.bounds = squaredBounds
-    chartContainer.center = bounds.center()
-
     if chartContainer.superview == nil {
       chartContainer.transform = CGAffineTransformMakeRotation(CGFloat(-M_PI_2))
-
       addSubview(chartContainer)
+    }
 
-      if chartBackgroundSegment == nil {
-        chartBackgroundSegment = SegmentLayer(frame: chartContainer.frame, start: 0, end: CGFloat(M_PI * 2), lineWidth: lineWidth, color: chartBackgroundColor.CGColor)
-        self.layer.insertSublayer(chartBackgroundSegment!, below: chartContainer.layer)
-      }
+    chartContainer.bounds = squaredBounds
+    chartContainer.center = bounds.center()
+    
+    if let backgroundSegment = chartBackgroundSegment {
+      backgroundSegment.frame = chartContainer.bounds
+    } else {
+      chartBackgroundSegment = SegmentLayer(frame: chartContainer.bounds, start: 0, end: CGFloat(M_PI * 2), lineWidth: lineWidth, color: chartBackgroundColor.CGColor)
+      chartContainer.layer.insertSublayer(chartBackgroundSegment!, atIndex:0)
     }
 
     for layer in chartSegmentLayers {
