@@ -1,4 +1,5 @@
 [![Stories in Ready](https://badge.waffle.io/mlisik/MRLCircleChart.png?label=ready&title=Ready)](https://waffle.io/mlisik/MRLCircleChart)
+[![Stories in Ready](https://badge.waffle.io/mlisik/MRLCircleChart.png?label=ready&title=Ready)](https://waffle.io/mlisik/MRLCircleChart)
 # MRLCircleChart
 
 [![CI Status](http://img.shields.io/travis/mlisik/MRLCircleChart.svg?style=flat)](https://travis-ci.org/mlisik/MRLCircleChart)
