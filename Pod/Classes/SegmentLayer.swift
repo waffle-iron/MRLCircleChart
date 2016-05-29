@@ -36,8 +36,7 @@ class SegmentLayer: CALayer {
   struct PropertyKeys {
     static let startAngleKey = "startAngle"
     static let endAngleKey = "endAngle"
-    static let innerRadiusKey = "innerRadius"
-    static let outerRadiusKey = "outerRadius"
+    static let lineWidthKey = "lineWidth"
     static let colorKey = "color"
     static let capType = "capType"
 
@@ -45,8 +44,7 @@ class SegmentLayer: CALayer {
       colorKey,
       startAngleKey,
       endAngleKey,
-      innerRadiusKey,
-      outerRadiusKey
+      lineWidthKey
     ]
   }
   /**
@@ -60,8 +58,7 @@ class SegmentLayer: CALayer {
 
   @NSManaged var startAngle: CGFloat
   @NSManaged var endAngle: CGFloat
-  @NSManaged var innerRadius: CGFloat
-  @NSManaged var outerRadius: CGFloat
+  @NSManaged var lineWidth: CGFloat
   @NSManaged var color: CGColorRef
 
   var animationDuration: Double = Constants.animationDuration
@@ -81,21 +78,19 @@ class SegmentLayer: CALayer {
    frame should be identical for all chart segments.
    - parameter start:       angle at which to begin drawing
    - parameter end:         angle at which to stop drawing
-   - parameter outerRadius: radius of the outer border
-   - parameter innerRadius: radius of the inner border, used to 'punch a hole' in the center of the chart, can be 0 for a full chart
+   - parameter lineWidth:   chart's width
    - parameter color:       `CGColorRef` color of the segment
 
    - returns: a fully configured `SegmentLayer` instance
    */
 
-  required init(frame: CGRect, start: CGFloat, end: CGFloat, outerRadius: CGFloat, innerRadius: CGFloat, color: CGColorRef) {
+  required init(frame: CGRect, start: CGFloat, end: CGFloat, lineWidth: CGFloat, color: CGColorRef) {
     super.init()
 
     self.frame = frame
     self.startAngle = start
     self.endAngle = end
-    self.outerRadius = outerRadius
-    self.innerRadius = innerRadius
+    self.lineWidth = lineWidth
     self.color = color
 
     self.commonInit()
@@ -103,15 +98,6 @@ class SegmentLayer: CALayer {
 
   override init(layer: AnyObject) {
     super.init(layer: layer)
-
-    if layer.isKindOfClass(SegmentLayer) {
-      self.startAngle = layer.startAngle
-      self.endAngle = layer.endAngle
-      self.outerRadius = layer.outerRadius
-      self.innerRadius = layer.innerRadius
-      self.color = layer.color
-      self.capType = layer.capType
-    }
     self.commonInit()
   }
 
@@ -147,8 +133,7 @@ class SegmentLayer: CALayer {
   override func actionForKey(event: String) -> CAAction? {
 
     let shouldSkipAnimationOnEntry = superlayer == nil
-      && (PropertyKeys.outerRadiusKey == event
-      || PropertyKeys.innerRadiusKey == event)
+      && (PropertyKeys.lineWidthKey == event)
 
     if event == PropertyKeys.colorKey {
       return animationForColor()
@@ -277,6 +262,9 @@ class SegmentLayer: CALayer {
 
     let pointOnCircle = point(center)
 
+    let outerRadius = bounds.width / 2
+    let innerRadius = outerRadius - lineWidth
+    
     let innerStartPoint = pointOnCircle(innerRadius, startAngle)
     let outerStartPoint = pointOnCircle(outerRadius, startAngle)
     let innerEndPoint = pointOnCircle(innerRadius, endAngle)
