@@ -54,6 +54,8 @@ public class Chart: UIView {
   @IBInspectable public var chartBackgroundColor: UIColor = UIColor(white: 0.7, alpha: 0.66)
   @IBInspectable public var beginColor: UIColor?
   @IBInspectable public var endColor: UIColor?
+  @IBInspectable public var inactiveBeginColor = UIColor.inactiveBeginColor()
+  @IBInspectable public var inactiveEndColor = UIColor.inactiveEndColor()
   
   //MARK: - Private variables
 
@@ -159,8 +161,8 @@ public class Chart: UIView {
     )
 
     grayscalePalette = UIColor.colorRange(
-      beginColor: UIColor(white: 0.6, alpha: 0.5),
-      endColor: UIColor(white: 0.2, alpha: 0.5),
+      beginColor: inactiveBeginColor,
+      endColor: inactiveEndColor,
       count: source.numberOfItems()
     )
   }
@@ -411,5 +413,15 @@ public class Chart: UIView {
       }
       break
     }
+  }
+}
+
+private extension UIColor {
+  static func inactiveBeginColor() -> UIColor {
+    return UIColor(white: 0.5, alpha: 1.0)
+  }
+  
+  static func inactiveEndColor() -> UIColor {
+    return UIColor(white: 0.15, alpha: 1.0)
   }
 }
