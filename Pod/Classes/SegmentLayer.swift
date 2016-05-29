@@ -39,6 +39,7 @@ class SegmentLayer: CALayer {
     static let lineWidthKey = "lineWidth"
     static let colorKey = "color"
     static let capType = "capType"
+    static let boundsKey = "bounds"
 
     static let animatableProperties = [
       colorKey,
@@ -127,9 +128,8 @@ class SegmentLayer: CALayer {
 
    - parameter event: String corresponding to the property key
 
-   - returns: a custom animation for specified properties or `nil` for everything
-   else
-   */
+   - returns: a custom animation for specified properties
+  */
   override func actionForKey(event: String) -> CAAction? {
 
     let shouldSkipAnimationOnEntry = superlayer == nil
@@ -146,7 +146,7 @@ class SegmentLayer: CALayer {
       return animationForAngle(event)
     }
 
-    return nil//super.actionForKey(event)
+    return super.actionForKey(event)
   }
 
   /**
@@ -227,7 +227,8 @@ class SegmentLayer: CALayer {
 
   override class func needsDisplayForKey(key: String) -> Bool {
     if PropertyKeys.animatableProperties.contains(key)
-      || key == PropertyKeys.capType {
+      || key == PropertyKeys.capType
+      || key == PropertyKeys.boundsKey {
       return true
     }
     return super.needsDisplayForKey(key)
